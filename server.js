@@ -1,13 +1,26 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+const mongodb = require('mongoose');
+const userrrrr = 'nguyentiep';
+const passworddddd = 'nguyentiep';
+
+mongodb.connect('mongodb+srv://cluster0-rgk1s.mongodb.net/test', {
+  dbName: 'tmdt',
+  user: userrrrr,
+  pass : passworddddd,
+  useNewUrlParser: true,
+  useUnifiedTopology : true
+}).then(() => {
+  console.log('Connect database seccess !!!');
+});
 
 app.use(express.static("./public"));
 
 app.set("views", "./views");
 app.set("view engine", "ejs");
-
-app.listen(3000);
+const port = 3000;
+app.listen(port,console.log(`Listening on port ${port}...`));
 
 app.get("/", function (req, res) {
      res.render("index");

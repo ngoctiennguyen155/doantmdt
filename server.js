@@ -2,13 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const mongodb = require('mongoose');
-const userrrrr = 'nguyentiep';
-const passworddddd = 'nguyentiep';
+const cors = require('cors');
+require('dotenv/config');
 
-mongodb.connect('mongodb+srv://cluster0-rgk1s.mongodb.net/test', {
+// connect mongodb 
+mongodb.connect(process.env.DB_CONNECT, {
   dbName: 'tmdt',
-  user: userrrrr,
-  pass : passworddddd,
   useNewUrlParser: true,
   useUnifiedTopology : true
 }).then(() => {
@@ -22,9 +21,30 @@ app.set("view engine", "ejs");
 const port = 3000;
 app.listen(port,console.log(`Listening on port ${port}...`));
 
-app.get("/", function (req, res) {
-     res.render("index");
-})
+const schema = require('./model/schema');
+app.use(bodyParser.json());
+
+// this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
+app.use(cors());
+//
+
+app.post('/', async function (req, res) {
+  const Schema = new schema({
+    title: req.body.title
+  });
+
+  try {
+    const savetitle = await Schema.save();
+    res.send(savetitle);
+  } catch (err) {
+    res.send(savetitle);
+  }
+});
+
+
+app.get('/', (req, res) => {
+  res.render('index');
+});
 
 app.get("/blog-details", function (req, res) {
   res.render("blog-details");

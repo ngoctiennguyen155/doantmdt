@@ -5,6 +5,7 @@ const mongodb = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
 
+
 // connect mongodb 
 mongodb.connect(process.env.DB_CONNECT, {
   dbName: 'tmdt',
@@ -22,8 +23,8 @@ const port = 3000;
 app.listen(port,console.log(`Listening on port ${port}...`));
 
 const schema = require('./model/schema');
-app.use(bodyParser.json());
-
+// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }))
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
 //
@@ -79,8 +80,23 @@ app.get("/index", function (req, res) {
 });
 
 app.get("/main", function (req, res) {
-  res.render("main");
+  
 });
 
 
 
+// route contact 
+const contactmessage = require('./model/contact');
+app.post('/contact', function (req, res) {
+  const newcontact = new contactmessage({
+    name : req.body.name,
+    email : req.body.email,
+    message : req.body.message
+  });
+  newcontact.save(); 
+  
+  res.render('contact');
+})
+
+
+//

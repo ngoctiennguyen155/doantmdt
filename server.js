@@ -44,7 +44,7 @@ app.post('/', async function (req, res) {
 });
 
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index', { page: "1"} );
 });
 
 app.get('/blog-details', function (req, res) {
@@ -72,7 +72,7 @@ app.get('/checkout', function (req, res) {
 });
 
 app.get('/contact', function (req, res) {
-  res.render('contact');
+  res.render('contact', { page: "2"});
 });
 
 app.get('/index', function (req, res) {
@@ -80,6 +80,9 @@ app.get('/index', function (req, res) {
 });
 
 app.get('/main', function (req, res) {});
+app.get('/about', function (req, res) {
+  res.render('about', { page: "3"});
+ });
 
 // route contact
 const contactmessage = require('./model/contact');
@@ -91,7 +94,7 @@ app.post('/contact', function (req, res) {
   });
   newcontact.save();
 
-  res.render('contact');
+  res.render('index');
 });
 
 //

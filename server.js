@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const ejs = require('ejs');
 const mongodb = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
@@ -29,22 +30,31 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
 //
+// const dssanpham = require('./model/sanpham');
+// app.post('/', async function (req, res) {
+//   const sp = new dssanpham({
+//     tensp: req.body.tensp,
+//     fileanh: req.body.fileanh,
+//     chitiet: req.body.chitiet,
+//     gia: req.body.gia,
+//     maloaisp: req.body.maloaisp,
+//     sl: req.body.sl,
+//     hsd: req.body.hsd
+//   });
 
-app.post('/', async function (req, res) {
-  const Schema = new schema({
-    title: req.body.title,
-  });
-
-  try {
-    const savetitle = await Schema.save();
-    res.send(savetitle);
-  } catch (err) {
-    res.send(savetitle);
-  }
-});
-
-app.get('/', (req, res) => {
-  res.render('index', { page: "1"} );
+//   try {
+//     const sa = await sp.save();
+//     res.send(sa);
+//   } catch (err) {
+//     res.send(err);
+//   }
+// });
+// load product
+const dssanpham = require('./model/saleproduct');
+app.get('/', async (req, res) => {
+  const data = await dssanpham.find();
+  console.log(data);
+  res.render('index', { listsp: data });
 });
 
 app.get('/blog-details', function (req, res) {
@@ -53,6 +63,9 @@ app.get('/blog-details', function (req, res) {
 
 app.get('/shop-grid', function (req, res) {
   res.render('shop-grid');
+});
+app.get('/admin', function (req, res) {
+  res.render('admin');
 });
 
 app.get('/shoping-cart', function (req, res) {
@@ -72,7 +85,7 @@ app.get('/checkout', function (req, res) {
 });
 
 app.get('/contact', function (req, res) {
-  res.render('contact', { page: "2"});
+  res.render('contact', { page: '2' });
 });
 
 app.get('/index', function (req, res) {
@@ -81,8 +94,8 @@ app.get('/index', function (req, res) {
 
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {
-  res.render('about', { page: "3"});
- });
+  res.render('about', { page: '3' });
+});
 
 // route contact
 const contactmessage = require('./model/contact');

@@ -45,6 +45,18 @@ const saleoff = mongoose.Schema({
           required: true,
           min: 1,
           max: 256
+     },
+     phantram: {
+          type: Number,
+          required: true,
+          min: 1,
+          max: 256
+     },
+     trangthai: {
+          type: String,
+          required: true,
+          min: 1,
+          max: 256
      }
 });
 

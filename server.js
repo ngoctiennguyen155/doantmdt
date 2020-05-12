@@ -51,10 +51,11 @@ app.use(cors());
 // });
 // load product
 const dssanpham = require('./model/saleproduct');
+const dsspnoibat = require('./model/sanphamnoibat');
 app.get('/', async (req, res) => {
-  const data = await dssanpham.find();
-  console.log(data);
-  res.render('index', { listsp: data });
+  const data = await dssanpham.find({trangthai:"con"});
+  const data2 = await dsspnoibat.find({ trangthai: "con" });
+  res.render('index', {listsp:data,listspnoibat:data2});
 });
 
 app.get('/blog-details', function (req, res) {
@@ -88,8 +89,10 @@ app.get('/contact', function (req, res) {
   res.render('contact', { page: '2' });
 });
 
-app.get('/index', function (req, res) {
-  res.render('index');
+app.get('/index', async (req, res) => {
+  const data = await dssanpham.find({ trangthai: 'con' });
+  const data2 = await dsspnoibat.find({ trangthai: 'con' });
+  res.render('index', { listsp: data, listspnoibat: data2 });
 });
 
 app.get('/main', function (req, res) {});

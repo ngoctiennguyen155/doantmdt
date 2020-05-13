@@ -8,11 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Ogani</title>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
 
     <!-- Css Styles -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
@@ -174,7 +176,7 @@
     <!-- Hero Section Begin -->
    <%- include('selection'); %>
     <!-- Hero Section End -->
-
+<%- include('validateemail'); %>
     <!-- Breadcrumb Section Begin -->
     <section class="breadcrumb-section set-bg" data-setbg="img/breadcrumb.jpg">
         <div class="container">
@@ -259,17 +261,17 @@
                     </div>
                 </div>
             </div>
-            <form action="/contact" method="POST">
+            <form action="/contact" method="POST" >
                 <div class="row">
                     <div class="col-lg-6 col-md-6">
-                        <input type="text" placeholder="Your name" name="name">
+                        <input type="text" placeholder="Your name" class="name" name="name">
                     </div>
                     <div class="col-lg-6 col-md-6">
-                        <input type="text" placeholder="Your Email" name="email">
+                        <input type="text" placeholder="Your Email" class="email" name="email">
                     </div>
                     <div class="col-lg-12 text-center">
-                        <textarea placeholder="Your message" name="message"></textarea>
-                        <button type="submit" class="site-btn" onclick="xuat()">SEND MESSAGE</button>
+                        <textarea placeholder="Your message" name="message" class="message"></textarea>
+                        <button type="submit" class="site-btn" >SEND MESSAGE</button>
                     </div>
                 </div>
             </form>
@@ -295,8 +297,44 @@
 
 </body>
 <script>
-    function xuat(){
-        alert("Thanks for your contact !!!");
+var str
+  $('form').submit(function (e) {
+    if($('.name').val()=="" ){
+       $('.name').focus();
+       return false;   
+    }else if($('.email').val()=="" ){
+        $('.email').focus();
+        return false;
+        }else if($('.message').val()=="" ){
+            $('.message').focus();
+            return false;
+            }else {checkemail();}
+  });
+
+  function checkemail() {
+    var URL =
+      'http://apilayer.net/api/check?access_key=c5118f1f9827f42a5fc4b231932130a8&email=' +
+      $('.email').val() +
+      '&smtp=1&format=1';
+    $.ajax({
+      type: 'get',
+      url: URL,
+      dataType: 'json',
+      success: render,
+    });
+    return false;
+  }
+
+  function render(data) {
+    if (data.format_valid == true && data.smtp_check == true) {
+     $('#id01').css("display","block");
+      document.querySelector('.textsub').innerHTML='<p>Thanks for your contact <3 !!!</p>';
+    } else {
+        $('#id01').css("display","block");
+      document.querySelector('.textsub').innerHTML='<p>Email not exist !!!</p>';
+      str = $(".textsub").val();
     }
+  }
+
 </script>
 </html>

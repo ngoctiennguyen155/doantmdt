@@ -34,10 +34,18 @@
           <p>
             Get E-mail updates about our latest shop and special offers.
           </p>
-          <form action="#">
-            <input type="text" placeholder="Enter your mail" />
-            <button type="submit" class="site-btn">Subscribe</button>
-          </form>
+          <span
+            >
+            <form>
+              <input type="text" id="email" placeholder="Enter your mail" >
+              <input
+                type="button"
+                id="btn"
+                class="site-btn"
+                value="Subscribe"
+              />
+            </form>
+          </span>
           <div class="footer__widget__social">
             <a href="#"><i class="fa fa-facebook"></i></a>
             <a href="#"><i class="fa fa-instagram"></i></a>
@@ -71,3 +79,32 @@
     </div>
   </div>
 </footer>
+<script>
+  $('#btn').click(function () {
+    check();
+  });
+
+  function check() {
+    var restURL =
+      'http://apilayer.net/api/check?access_key=c5118f1f9827f42a5fc4b231932130a8&email=' +
+      $('#email').val() +
+      '&smtp=1&format=1';
+    $.ajax({
+      type: 'get',
+      url: restURL,
+      dataType: 'json',
+      success: renderList,
+    });
+    return false;
+  }
+
+  function renderList(data) {
+    if (data.format_valid == true && data.smtp_check == true) {
+     $('#id01').css("display","block");
+      document.querySelector('.textsub').innerHTML='<p>Thanks for your subcribe <3 !!!</p>';
+    } else {
+        $('#id01').css("display","block");
+      document.querySelector('.textsub').innerHTML='<p>Email not exist !!!</p>';
+    }
+  }
+</script>

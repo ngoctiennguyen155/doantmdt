@@ -84,7 +84,6 @@ const options = {
 app.get('/shop-grid',async function (req, res, next) {
   var filter;
   var search = req.query.search || '';
-  // console.log(search);
   var query = '';
   if (search == '') {
     filter = {};
@@ -95,19 +94,23 @@ app.get('/shop-grid',async function (req, res, next) {
   }
   //console.log(filter);
   var page = req.query.page || 1;
-
-  var aggregateQuery = allsp.aggregate();
-
-  allsp.aggregate(filter,options, function (
-    err,
-    result
-  ) {
-    if (err) {
-      console.err(err);
-    } else {
-      res.json(result);
-    }
-  });
+  var perPage = 12;
+  await allsp
+        .find(filter)
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .exec(function(err, sanphamm) {
+            allsp.countDocuments().exec(function(err, count) {
+                if (err) return next(err)
+                res.render('shop-grid', {
+                  dssp: sanphamm,
+                  current: page,
+                  pages: Math.ceil(count / perPage),
+                  query: query,
+                  total: count
+                })
+            })
+        })
 });
 //app.use(mainroutes);
 
@@ -131,14 +134,11 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout');
 });
-<<<<<<< HEAD
-=======
 //route admin
 app.get('/admin', function(req, res){
   res.render('admin');
 })
 
->>>>>>> 9f8aae8ff017ac55b50d223011e80d00c2ca20f6
 
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {

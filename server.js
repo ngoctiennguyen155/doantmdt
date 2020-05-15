@@ -5,6 +5,7 @@ const ejs = require('ejs');
 const mongodb = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
+var router = require('express').Router();
 
 // connect mongodb
 mongodb
@@ -16,8 +17,9 @@ mongodb
   .then(() => {
     console.log('Connect database seccess !!!');
   });
-
+var path = require('path');
 app.use(express.static('./public'));
+//app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
@@ -30,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
+const mongoosePaginate = require('mongoose-paginate-v2');
 //
 // const dssanpham = require('./model/sanpham');
 // app.post('/', async function (req, res) {
@@ -50,29 +53,64 @@ app.use(cors());
 //     res.send(err);
 //   }
 // });
-// load product route index 
-
-const dssanpham = require('./model/saleproduct');
-const dsspnoibat = require('./model/sanphamnoibat');
+// load product route index
+const allsp = require('./model/sanpham');
+const dssanpham = require('./model/sanpham');
+const dsspnoibat = require('./model/sanpham');
 app.get('/', async (req, res) => {
-  const data = await dssanpham.find({trangthai:"con",hieuluc:"con"});
-  const data2 = await dsspnoibat.find({ trangthai: "con" });
-  res.render('index', {listsp:data,listspnoibat:data2,message:""});
+  const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
+  const data2 = await dsspnoibat.find({ noibat: true });
+  res.render('index', { listsp: data, listspnoibat: data2, message: '' });
 });
 app.get('/index', async (req, res) => {
   const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
-  const data2 = await dsspnoibat.find({ trangthai: 'con' });
-  res.render('index', { listsp: data, listspnoibat: data2,message:"" });
+  const data2 = await dsspnoibat.find({ noibat: true });
+  res.render('index', { listsp: data, listspnoibat: data2, message: '' });
 });
 
 // route blog detail
 app.get('/blog-details', function (req, res) {
   res.render('blog-details');
 });
+
 // route shop grid
-app.get('/shop-grid', function (req, res) {
-  res.render('shop-grid');
+const options = {
+  page: 1,
+  limit: 12,
+  collation: {
+    locale: 'en',
+  },
+};
+app.get('/shop-grid',async function (req, res, next) {
+  var filter;
+  var search = req.query.search || '';
+  // console.log(search);
+  var query = '';
+  if (search == '') {
+    filter = {};
+    query = '';
+  } else {
+    filter = { maloaisp: search };
+    query = search;
+  }
+  //console.log(filter);
+  var page = req.query.page || 1;
+
+  var aggregateQuery = allsp.aggregate();
+
+  allsp.aggregate(filter,options, function (
+    err,
+    result
+  ) {
+    if (err) {
+      console.err(err);
+    } else {
+      res.json(result);
+    }
+  });
 });
+//app.use(mainroutes);
+
 //route admin
 app.get('/admin', function (req, res) {
   res.render('admin');
@@ -94,8 +132,6 @@ app.get('/checkout', function (req, res) {
   res.render('checkout');
 });
 
-
-
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {
   res.render('about', { page: '3' });
@@ -115,8 +151,12 @@ app.post('/contact', async function (req, res) {
   newcontact.save();
 
   const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
-  const data2 = await dsspnoibat.find({ trangthai: 'con' });
-  res.render('index', { listsp: data, listspnoibat: data2,message:"Thanks for your contact !!!" });
+  const data2 = await dsspnoibat.find({ noibat: true });
+  res.render('index', {
+    listsp: data,
+    listspnoibat: data2,
+    message: 'Thanks for your contact !!!',
+  });
 });
 
 //

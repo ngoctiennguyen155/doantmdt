@@ -93,7 +93,10 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout');
 });
-
+//route admin
+app.get('/admin', function(req, res){
+  res.render('admin');
+})
 
 
 app.get('/main', function (req, res) {});

@@ -131,14 +131,11 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout');
 });
-<<<<<<< HEAD
-=======
 //route admin
 app.get('/admin', function(req, res){
   res.render('admin');
 })
 
->>>>>>> 9f8aae8ff017ac55b50d223011e80d00c2ca20f6
 
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {

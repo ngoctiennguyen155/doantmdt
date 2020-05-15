@@ -74,17 +74,13 @@ app.get('/blog-details', function (req, res) {
 });
 
 // route shop grid
-const options = {
-  page: 1,
-  limit: 12,
-  collation: {
-    locale: 'en',
-  },
-};
+// mongoosePaginate.paginate.options = {
+//   lean: true,
+//   limit: 20,
+// };
 app.get('/shop-grid',async function (req, res, next) {
   var filter;
   var search = req.query.search || '';
-  // console.log(search);
   var query = '';
   if (search == '') {
     filter = {};
@@ -93,21 +89,48 @@ app.get('/shop-grid',async function (req, res, next) {
     filter = { maloaisp: search };
     query = search;
   }
-  //console.log(filter);
   var page = req.query.page || 1;
-
-  var aggregateQuery = allsp.aggregate();
-
-  allsp.aggregate(filter,options, function (
-    err,
-    result
-  ) {
+  var perPage = 12;
+  const options = {
+    page: page,
+    limit: 12,
+    collation: {
+      locale: 'en',
+    },
+  };
+  //console.log(filter);
+  await allsp.paginate(filter,options, function (err, result) {
     if (err) {
-      console.err(err);
+      console.log(err);
     } else {
-      res.json(result);
+      res.render('shop-grid', {
+        dssp: result.docs,
+        page: result.page,
+        pages: result.totalPages,
+        query: query,
+        total: result.totalDocs,
+        nextPage: result.hasNextPage,
+        perPage: result.hasPrevPage
+        
+      });
     }
-  });
+  })
+  // await allsp
+  //       .find(filter)
+  //       .skip((perPage * page) - perPage)
+  //       .limit(perPage)
+  //       .exec(function(err, sanphamm) {
+  //           allsp.countDocuments().exec(function(err, count) {
+  //               if (err) return next(err)
+  //               res.render('shop-grid', {
+  //                 dssp: sanphamm,
+  //                 current: page,
+  //                 pages: Math.ceil(count / perPage),
+  //                 query: query,
+  //                 total: count
+  //               })
+  //           })
+  //       })
 });
 //app.use(mainroutes);
 

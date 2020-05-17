@@ -8,6 +8,7 @@ require('dotenv/config');
 var router = require('express').Router();
 
 // connect mongodb
+mongodb.set('useCreateIndex', true);
 mongodb
   .connect(process.env.DB_CONNECT, {
     dbName: 'tmdt',
@@ -58,13 +59,27 @@ const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
 const dsspnoibat = require('./model/sanpham');
 app.get('/', async (req, res) => {
-  const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
-  const data2 = await dsspnoibat.find({ noibat: true });
+  const data = await dssanpham.find({
+    trangthai: 'con',
+    hieuluc: 'con',
+    sl: { $regex: /[^0]/, $options: 'm' },
+  });
+  const data2 = await dsspnoibat.find({
+    noibat: true,
+    sl: { $regex: /[^0]/, $options: 'm' },
+  });
   res.render('index', { listsp: data, listspnoibat: data2, message: '' });
 });
 app.get('/index', async (req, res) => {
-  const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
-  const data2 = await dsspnoibat.find({ noibat: true });
+  const data = await dssanpham.find({
+    trangthai: 'con',
+    hieuluc: 'con',
+    sl: { $regex: /[^0]/, $options: 'm' },
+  });
+  const data2 = await dsspnoibat.find({
+    noibat: true,
+    sl: { $regex: /[^0]/, $options: 'm' },
+  });
   res.render('index', { listsp: data, listspnoibat: data2, message: '' });
 });
 
@@ -82,13 +97,24 @@ app.get('/shop-grid',async function (req, res, next) {
   var filter;
   var search = req.query.search || '';
   var query = '';
-  if (search == '') {
-    filter = {};
-    query = '';
+  var searchbar = req.query.searchbar || "";
+  if (searchbar == "") {
+    if (search == '') {
+      filter = { sl: { $regex: /[^0]/, $options: 'm' } };
+      query = '';
+    } else {
+      filter = { maloaisp: search, sl: { $regex: /[^0]/, $options: 'm' } };
+      query = search;
+    }
   } else {
-    filter = { maloaisp: search };
-    query = search;
+    var querysearchbar = `"\" + ${searchbar} + \""`;
+    filter = {
+      $text: { $search: querysearchbar, $caseSensitive: false },
+      sl: { $regex: /[^0]/, $options: 'm' },
+    };
+    query = searchbar;
   }
+
   var page = req.query.page || 1;
   var perPage = 12;
   const options = {
@@ -115,6 +141,8 @@ app.get('/shop-grid',async function (req, res, next) {
       });
     }
   })
+
+
   // await allsp
   //       .find(filter)
   //       .skip((perPage * page) - perPage)

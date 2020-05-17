@@ -34,10 +34,9 @@
           <p>
             Get E-mail updates about our latest shop and special offers.
           </p>
-          <span
-            >
+          <span>
             <form>
-              <input type="text" id="email" placeholder="Enter your mail" >
+              <input type="text" id="email" placeholder="Enter your mail" />
               <input
                 type="button"
                 id="btn"
@@ -86,9 +85,8 @@
 
   function check() {
     var restURL =
-      'http://apilayer.net/api/check?access_key=c5118f1f9827f42a5fc4b231932130a8&email=' +
-      $('#email').val() +
-      '&smtp=1&format=1';
+      'http://apilayer.net/api/check?access_key=04f4983ef5dee6eb3c0f7f68c015e759&email=' +
+      $('#email').val() +'&smtp=1&format =1';
     $.ajax({
       type: 'get',
       url: restURL,
@@ -100,11 +98,13 @@
 
   function renderList(data) {
     if (data.format_valid == true && data.smtp_check == true) {
-     $('#id01').css("display","block");
-      document.querySelector('.textsub').innerHTML='<p>Thanks for your subcribe <3 !!!</p>';
+      $('#id01').css('display', 'block');
+      document.querySelector('.textsub').innerHTML =
+        '<p>Thanks for your subcribe <3 !!!</p>';
     } else {
-        $('#id01').css("display","block");
-      document.querySelector('.textsub').innerHTML='<p>Email not exist !!!</p>';
+      $('#id01').css('display', 'block');
+      document.querySelector('.textsub').innerHTML =
+        '<p>Email not exist !!!</p>';
     }
   }
 </script>

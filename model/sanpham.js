@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const sanpham = mongoose.Schema({
   _id: {
-    type: String,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
   },
   tensp: {
     type: String,
@@ -37,7 +37,7 @@ const sanpham = mongoose.Schema({
     required: true,
     min: 1,
     max: 256,
-    text : true
+    text: true,
   },
   sl: {
     type: String,

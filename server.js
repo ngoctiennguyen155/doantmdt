@@ -167,13 +167,25 @@ app.get('/admin', function (req, res) {
   res.render('admin');
 });
 //route shopping cart
-app.get('/shoping-cart', function (req, res) {
+app.get('/shoping-cart', function (req, res,next) {
   res.render('shoping-cart');
 });
 //route shop details
+var ObjectId = require('mongodb').ObjectID;
+var getitem = require('./model/sanpham');
 app.get('/shop-details', function (req, res) {
-  res.render('shop-details');
+  var id = req.query.id;
+  var o_id = new ObjectId(id);
+  getitem.findOne({ _id: o_id }).then(docs => {
+    var sp = docs;
+    res.render('shop-details', {sp:sp});
+  }).catch(err => {
+    next(err);
+  });
+  //console.log(item); 
 });
+
+
 //route blog
 app.get('/blog', function (req, res) {
   res.render('blog');

@@ -6,7 +6,7 @@ const mongodb = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
 var router = require('express').Router();
-
+const passport = require('passport');
 // connect mongodb
 mongodb.set('useCreateIndex', true);
 mongodb
@@ -59,6 +59,7 @@ const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
 const dsspnoibat = require('./model/sanpham');
 app.get('/', async (req, res) => {
+  const sess = req.session;
   const data = await dssanpham.find({
     trangthai: 'con',
     hieuluc: 'con',
@@ -69,6 +70,7 @@ app.get('/', async (req, res) => {
     sl: { $regex: /[^0]/, $options: 'm' },
   });
   res.render('index', { listsp: data, listspnoibat: data2, message: '' });
+  //console.log(session.cart);
 });
 app.get('/index', async (req, res) => {
   const data = await dssanpham.find({
@@ -166,10 +168,53 @@ app.get('/shop-grid',async function (req, res, next) {
 app.get('/admin', function (req, res) {
   res.render('admin');
 });
+
+
 //route shopping cart
+const session = require('express-session');
+const mongostore = require('connect-mongo')(session);
+app.use(
+  session({
+    secret: 'foo',
+    saveUninitialized: true,
+    resave: true,
+    // resave: true,
+    store: new mongostore({ mongooseConnection: mongodb.connection }),
+    cookie: { maxAge: 1000 * 60 * 60 },
+  })
+);
+// app.use(passport.session());
+app.use(function (req, res, next) {
+  res.locals.session = req.session.cart.Session;
+  console.log(req.session);
+  next();
+});
+
 app.get('/shoping-cart', function (req, res,next) {
   res.render('shoping-cart');
 });
+var Cart = require('./model/cart');
+app.get('/add-to-cart', function (req, res, next) {
+  var id = req.query.id;
+  var sl = req.query.sl;
+  // console.log(id);
+  // console.log(sl);
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+  allsp.findById(new ObjectId(id), function (err, product) {
+    if (err) {
+      return res.redirect('/');
+    }
+    var giasell = product.gia -(product.gia*product.phantram/100)
+    cart.add(product, product._id,sl,giasell);
+    req.session.cart = cart;
+    console.log(req.session);   
+    var zz = req.session.cart; 
+    res.render('/',{z:zz});
+  })
+
+})
+
+
 //route shop details
 var ObjectId = require('mongodb').ObjectID;
 var getitem = require('./model/sanpham');
@@ -181,7 +226,7 @@ app.get('/shop-details', function (req, res) {
     res.render('shop-details', {sp:sp});
   }).catch(err => {
     next(err);
-  });
+  });;
   //console.log(item); 
 });
 

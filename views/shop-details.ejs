@@ -259,15 +259,18 @@
               <p>
                 <%=item.chitiet%>
               </p>
+            <form method="get" action="/add-to-cart?id=<%=item._id%>">
+              
               <div class="product__details__quantity">
                 <div class="quantity">
                   <div class="pro-qty">
-                    <input type="text" value="1" />
+                    <input name="sl" type="text" value="1" />
                   </div>
                 </div>
               </div>
-              <a href="#" class="primary-btn">ADD TO CARD</a>
-
+              <button class="primary-btn" style="border: none;">ADD TO CARD</button>
+               <input style="visibility: hidden;;" name="id" value="<%=item._id%>"/>
+              </form>
               <ul>
                 <li><b>Availability</b> <span>In Stock</span></li>
                 <li>

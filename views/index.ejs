@@ -43,10 +43,10 @@
       <ul>
         <!-- <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li> -->
         <li>
-          <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span>3</span></a>
+          <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span></span></a>
         </li>
       </ul>
-      <div class="header__cart__price">item: <span>$150.00</span></div>
+      <div class="header__cart__price">item: <span></span></div>
     </div>
     <div class="humberger__menu__widget">
       <!-- <div class="header__top__right__language">
@@ -242,7 +242,7 @@
                       <a href="#"><i class="fa fa-retweet"></i></a>
                     </li> -->
           <li>
-            <a href="#"><i class="fa fa-shopping-cart"></i></a>
+            <a href="/add-to-cart?id=<%=sp.id%>&sl=1"><i class="fa fa-shopping-cart"></i></a>
           </li>
         </ul>
       </div>
@@ -333,13 +333,13 @@
                     <a href="#"><i class="fa fa-retweet"></i></a>
                   </li> -->
                 <li>
-                  <a href="#"><i class="fa fa-shopping-cart"></i></a>
+                  <a href="/add-to-cart?id=<%=e._id%>&sl=1"><i class="fa fa-shopping-cart"></i></a>
                 </li>
               </ul>
             </div>
             <div class="featured__item__text">
               <h6><a href="/shop-details?id=<%=e._id%>"> <%=e.tensp%> </a></h6>
-              <h5><%= e.gia %> VNĐ</h5>
+              <h5><%= e.gia-(e.gia*e.phantram/100) %> VNĐ</h5>
             </div>
           </div>
         </div>

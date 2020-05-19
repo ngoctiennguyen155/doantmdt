@@ -40,9 +40,10 @@ const port = 3000;
 app.listen(port, console.log(`Listening on port ${port}...`));
 
 const schema = require('./model/schema');
-// app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
 const mongoosePaginate = require('mongoose-paginate-v2');
@@ -178,9 +179,13 @@ app.get('/shop-grid',async function (req, res, next) {
 
 //route admin
 app.get('/admin', function (req, res) {
+  res.render('login');
+});
+app.post('/admin',async function (req, res) {
+  // create user in req.body
+  console.log(await req.body);
   res.render('admin');
 });
-
 
 //route shopping cart
 

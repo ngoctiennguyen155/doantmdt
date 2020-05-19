@@ -5,7 +5,9 @@ const ejs = require('ejs');
 const mongodb = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
+
 var router = require('express').Router();
+
 const passport = require('passport');
 // connect mongodb
 mongodb.set('useCreateIndex', true);
@@ -19,21 +21,28 @@ mongodb
     console.log('Connect database seccess !!!');
   });
 var path = require('path');
+
+
+/// middleware
 app.use(express.static('./public'));
 //app.use(express.static(path.join(__dirname, 'public')));
 var Cart = require('./model/cart');
 const session = require('express-session');
 const mongostore = require('connect-mongo')(session);
+
 app.use(
   session({
-    secret: 'foo',
+    secret: 'nguyenngoctien',
     saveUninitialized: true,
     resave: true,
     // resave: true,
-    store: new mongostore({ mongooseConnection: mongodb.connection }),
-    cookie: { maxAge: 1000 * 60 * 60 },
+    store: new mongostore({ mongooseConnection: mongodb.connection })
+    // ,
+    // cookie: { maxAge: 1000 * 60 * 60 },
   })
 );
+
+//
 app.set('views', './views');
 app.set('view engine', 'ejs');
 const port = 3000;
@@ -43,7 +52,8 @@ const schema = require('./model/schema');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+var urlencodedParser = bodyParser.urlencoded({ extended: true });
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
 const mongoosePaginate = require('mongoose-paginate-v2');
@@ -177,15 +187,6 @@ app.get('/shop-grid',async function (req, res, next) {
 });
 //app.use(mainroutes);
 
-//route admin
-app.get('/admin', function (req, res) {
-  res.render('login');
-});
-app.post('/admin',async function (req, res) {
-  // create user in req.body
-  console.log(await req.body);
-  res.render('admin');
-});
 
 //route shopping cart
 
@@ -253,9 +254,28 @@ app.get('/checkout', function (req, res) {
 });
 //route admin
 app.get('/admin', function(req, res){
-  res.render('admin');
+  res.render('login');
 })
-
+//route admin
+const ac = require('./model/accout');
+app.post('/admin',function (req, res) {
+  // create user in req.body
+  const e = req.body.username;
+  const pw = req.body.password;
+  console.log(e);
+  console.log(pw);
+  const user = ac.findOne({ email: e,matkhau:pw }, (err, result) => {
+    if (err) {
+      throw err;
+    };
+    if (result) {
+      res.render('admin');
+    } else {
+      res.redirect('/admin');
+    }
+  });
+});
+////
 
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {

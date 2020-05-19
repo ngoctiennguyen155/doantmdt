@@ -21,7 +21,19 @@ mongodb
 var path = require('path');
 app.use(express.static('./public'));
 //app.use(express.static(path.join(__dirname, 'public')));
-
+var Cart = require('./model/cart');
+const session = require('express-session');
+const mongostore = require('connect-mongo')(session);
+app.use(
+  session({
+    secret: 'foo',
+    saveUninitialized: true,
+    resave: true,
+    // resave: true,
+    store: new mongostore({ mongooseConnection: mongodb.connection }),
+    cookie: { maxAge: 1000 * 60 * 60 },
+  })
+);
 app.set('views', './views');
 app.set('view engine', 'ejs');
 const port = 3000;
@@ -55,11 +67,11 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 //   }
 // });
 // load product route index
+const cartnull = { item: {}, totalQty: 0, totalPrice: Number(0) };
 const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
 const dsspnoibat = require('./model/sanpham');
 app.get('/', async (req, res) => {
-  const sess = req.session;
   const data = await dssanpham.find({
     trangthai: 'con',
     hieuluc: 'con',
@@ -69,7 +81,7 @@ app.get('/', async (req, res) => {
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
-  res.render('index', { listsp: data, listspnoibat: data2, message: '' });
+  res.render('index', { listsp: data, listspnoibat: data2, message: '',session:req.session.cart || cartnull});
   //console.log(session.cart);
 });
 app.get('/index', async (req, res) => {
@@ -82,7 +94,7 @@ app.get('/index', async (req, res) => {
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
-  res.render('index', { listsp: data, listspnoibat: data2, message: '' });
+  res.render('index', { listsp: data, listspnoibat: data2, message: '',session:req.session.cart || cartnull });
 });
 
 // route blog detail
@@ -138,8 +150,8 @@ app.get('/shop-grid',async function (req, res, next) {
         query: query,
         total: result.totalDocs,
         nextPage: result.hasNextPage,
-        perPage: result.hasPrevPage
-        
+        perPage: result.hasPrevPage,
+        session:req.session.cart || cartnull
       });
     }
   })
@@ -171,30 +183,20 @@ app.get('/admin', function (req, res) {
 
 
 //route shopping cart
-const session = require('express-session');
-const mongostore = require('connect-mongo')(session);
-app.use(
-  session({
-    secret: 'foo',
-    saveUninitialized: true,
-    resave: true,
-    // resave: true,
-    store: new mongostore({ mongooseConnection: mongodb.connection }),
-    cookie: { maxAge: 1000 * 60 * 60 },
-  })
-);
+
 // app.use(passport.session());
-app.use(function (req, res, next) {
-  res.locals.session = req.session.cart.Session;
-  console.log(req.session);
-  next();
+// app.use(function (req, res, next) {
+//   const session = req.session;
+//   next();
+// });
+
+app.get('/shoping-cart', function (req, res, next) {
+  var cart = new Cart(req.session.cart ||{});
+  console.log(cart.genetateArr());
+  res.render('shoping-cart', { session: req.session.cart || cartnull ,getcart: cart.genetateArr()||[],subtotal:cart.totalPrice || 0,phantram : 0});
 });
 
-app.get('/shoping-cart', function (req, res,next) {
-  res.render('shoping-cart');
-});
-var Cart = require('./model/cart');
-app.get('/add-to-cart', function (req, res, next) {
+app.get('/add-to-cart', function (req, res) {
   var id = req.query.id;
   var sl = req.query.sl;
   // console.log(id);
@@ -204,12 +206,14 @@ app.get('/add-to-cart', function (req, res, next) {
     if (err) {
       return res.redirect('/');
     }
-    var giasell = product.gia -(product.gia*product.phantram/100)
+    var giasell;
+    if(product.hieuluc==="con")
+      giasell = product.gia - (product.gia * product.phantram / 100);
+    else giasell = product.gia;
     cart.add(product, product._id,sl,giasell);
     req.session.cart = cart;
-    console.log(req.session);   
-    var zz = req.session.cart; 
-    res.render('/',{z:zz});
+    console.log(req.session.cart);   
+    res.redirect('/');
   })
 
 })
@@ -223,7 +227,10 @@ app.get('/shop-details', function (req, res) {
   var o_id = new ObjectId(id);
   getitem.findOne({ _id: o_id }).then(docs => {
     var sp = docs;
-    res.render('shop-details', {sp:sp});
+    res.render('shop-details', {
+      sp: sp,
+      session: req.session.cart || cartnull,
+    });
   }).catch(err => {
     next(err);
   });;
@@ -237,7 +244,7 @@ app.get('/blog', function (req, res) {
 });
 //route check out
 app.get('/checkout', function (req, res) {
-  res.render('checkout');
+  res.render('checkout', { session: req.session.cart || cartnull });
 });
 //route admin
 app.get('/admin', function(req, res){
@@ -247,12 +254,12 @@ app.get('/admin', function(req, res){
 
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {
-  res.render('about', { page: '3' });
+  res.render('about', { page: '3', session: req.session.cart || cartnull });
 });
 
 // route contact
 app.get('/contact', function (req, res) {
-  res.render('contact');
+  res.render('contact', { session: req.session.cart || cartnull });
 });
 const contactmessage = require('./model/contact');
 app.post('/contact', async function (req, res) {
@@ -269,7 +276,21 @@ app.post('/contact', async function (req, res) {
     listsp: data,
     listspnoibat: data2,
     message: 'Thanks for your contact !!!',
+    session: req.session.cart || cartnull,
   });
 });
 
 //
+const coupon = require('./model/coupon');
+app.post('/add-coupon',async function (req, res) {
+  const mac = req.body.coupon;
+  const newcoupon = await coupon.find({ ma: mac });
+  console.log(newcoupon[0].phantram);
+  var cart = new Cart(req.session.cart || {});
+   res.render('shoping-cart', {
+     session: req.session.cart || cartnull,
+     getcart: cart.genetateArr() || [],
+     subtotal: cart.totalPrice || 0,
+     phantram: newcoupon[0].phantram,
+   });
+})

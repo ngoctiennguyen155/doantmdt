@@ -10,7 +10,7 @@ module.exports = function Cart(oldCart) {
                this.totalQty++;
           }else{
                storeItem.qty += Number(sl);
-               storeItem.totalprice = storeItem.qty * giasell;
+               storeItem.totalprice = storeItem.qty * storeItem.price;
           }
           this.totalPrice += Number(sl) * giasell;
      };

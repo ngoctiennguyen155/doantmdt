@@ -43,12 +43,10 @@
         <ul>
           <!-- <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li> -->
           <li>
-            <a href="/shoping-cart"
-              ><i class="fa fa-shopping-bag"></i> <span>3</span></a
-            >
-          </li>
-        </ul>
-        <div class="header__cart__price">item: <span>$150.00</span></div>
+            <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
+        </li>
+      </ul>
+      <div class="header__cart__price">item: <span><%=session.totalPrice%> VNĐ</span></div>
       </div>
       <div class="humberger__menu__widget">
         <!-- <div class="header__top__right__language">
@@ -169,12 +167,10 @@
               <ul>
                 <!-- <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li> -->
                 <li>
-                  <a href="/shoping-cart"
-                    ><i class="fa fa-shopping-bag"></i> <span>3</span></a
-                  >
-                </li>
-              </ul>
-              <div class="header__cart__price">item: <span>$150.00</span></div>
+                  <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
+        </li>
+      </ul>
+      <div class="header__cart__price">item: <span><%=session.totalPrice%> VNĐ</span></div>
             </div>
           </div>
         </div>
@@ -223,72 +219,37 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <% if(session.totalQty!=0){
+                     getcart.forEach(e=>{ %>
+                    <tr>
                     <td class="shoping__cart__item">
-                      <img src="img/cart/cart-1.jpg" alt="" />
-                      <h5>Vegetable’s Package</h5>
+                      
+                      <img style="width: 100px;" src="images/<%=e.item.maloaisp%>/<%=e.item.fileanh%>" alt="" />
+                      <h5><%=e.item.tensp%><%if(e.item.phantram){%><label>&#160;( -<%=e.item.phantram%>%)</label><%}%></h5> 
+                      
                     </td>
                     <td class="shoping__cart__price">
-                      $55.00
+                      <%=e.item.gia%> VNĐ
                     </td>
                     <td class="shoping__cart__quantity">
                       <div class="quantity">
                         <div class="pro-qty">
-                          <input type="text" value="1" />
+                          <input type="text" value="<%=e.qty%>" />
                         </div>
                       </div>
                     </td>
                     <td class="shoping__cart__total">
-                      $110.00
+                     <%=e.totalprice%> VNĐ
                     </td>
                     <td class="shoping__cart__item__close">
                       <span class="icon_close"></span>
                     </td>
                   </tr>
-                  <tr>
-                    <td class="shoping__cart__item">
-                      <img src="img/cart/cart-2.jpg" alt="" />
-                      <h5>Fresh Garden Vegetable</h5>
-                    </td>
-                    <td class="shoping__cart__price">
-                      $39.00
-                    </td>
-                    <td class="shoping__cart__quantity">
-                      <div class="quantity">
-                        <div class="pro-qty">
-                          <input type="text" value="1" />
-                        </div>
-                      </div>
-                    </td>
-                    <td class="shoping__cart__total">
-                      $39.99
-                    </td>
-                    <td class="shoping__cart__item__close">
-                      <span class="icon_close"></span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="shoping__cart__item">
-                      <img src="img/cart/cart-3.jpg" alt="" />
-                      <h5>Organic Bananas</h5>
-                    </td>
-                    <td class="shoping__cart__price">
-                      $69.00
-                    </td>
-                    <td class="shoping__cart__quantity">
-                      <div class="quantity">
-                        <div class="pro-qty">
-                          <input type="text" value="1" />
-                        </div>
-                      </div>
-                    </td>
-                    <td class="shoping__cart__total">
-                      $69.99
-                    </td>
-                    <td class="shoping__cart__item__close">
-                      <span class="icon_close"></span>
-                    </td>
-                  </tr>
+                      <%})
+                      %>
+                  <%}
+                  %>
+                  
                 </tbody>
               </table>
             </div>
@@ -308,8 +269,8 @@
             <div class="shoping__continue">
               <div class="shoping__discount">
                 <h5>Discount Codes</h5>
-                <form action="#">
-                  <input type="text" placeholder="Enter your coupon code" />
+                <form action="/add-coupon" method="POST">
+                  <input type="text" name="coupon" placeholder="Enter your coupon code" />
                   <button type="submit" class="site-btn">APPLY COUPON</button>
                 </form>
               </div>
@@ -319,11 +280,11 @@
             <div class="shoping__checkout">
               <h5>Cart Total</h5>
               <ul>
-                <li>Subtotal <span>$454.98</span></li>
+                <li>Subtotal <span><%=subtotal%> VNĐ</span></li>
                 <li style="padding: 0px;">
-                  <span style="font-size: 15px;">-$454.98</span>
+                  <span style="font-size: 15px;">-<%=phantram%> VNĐ</span>
                 </li>
-                <li>Total <span>$454.98</span></li>
+                <li>Total <span><%=subtotal - (subtotal*phantram/100)%> VNĐ</span></li>
               </ul>
               <a href="/checkout" class="primary-btn">PROCEED TO CHECKOUT</a>
             </div>

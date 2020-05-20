@@ -2,14 +2,15 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const sanpham = mongoose.Schema({
   _id: {
-    type: String,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
   },
   tensp: {
     type: String,
     required: true,
     min: 1,
     max: 256,
+    text: true,
   },
   fileanh: {
     type: String,
@@ -22,18 +23,21 @@ const sanpham = mongoose.Schema({
     required: true,
     min: 1,
     max: 256,
+    text: true,
   },
   gia: {
     type: Number,
     required: true,
     min: 1,
     max: 256,
+    text: true,
   },
   maloaisp: {
     type: String,
     required: true,
     min: 1,
     max: 256,
+    text: true,
   },
   sl: {
     type: String,
@@ -65,7 +69,7 @@ const sanpham = mongoose.Schema({
     max: 256,
   },
   noibat: {
-    type: Boolean
+    type: Boolean,
   },
 });
 sanpham.plugin(mongoosePaginate);

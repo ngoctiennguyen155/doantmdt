@@ -62,12 +62,27 @@ app.get('/', async (req, res) => {
   const data2 = await dsspnoibat.find({ noibat: true });
   res.render('index', { listsp: data, listspnoibat: data2, message: '' });
 });
+
 app.get('/index', async (req, res) => {
   const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
   const data2 = await dsspnoibat.find({ noibat: true });
   res.render('index', { listsp: data, listspnoibat: data2, message: '' });
 });
+//route admin
+app.get('/qlsanpham', async (req, res) => {
+  const data = await dssanpham.find({});
+  res.render('qlsanpham');
+});
 
+app.get('/hoadon', async (req, res) => {
+  const data = await dssanpham.find({});
+  res.render('hoadon');
+});
+
+app.get('/taikhoan', async (req, res) => {
+  const data = await dssanpham.find({});
+  res.render('taikhoan');
+});
 // route blog detail
 app.get('/blog-details', function (req, res) {
   res.render('blog-details');
@@ -111,10 +126,7 @@ app.get('/shop-grid',async function (req, res, next) {
 });
 //app.use(mainroutes);
 
-//route admin
-app.get('/admin', function (req, res) {
-  res.render('admin');
-});
+
 //route shopping cart
 app.get('/shoping-cart', function (req, res) {
   res.render('shoping-cart');
@@ -131,23 +143,22 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout');
 });
-<<<<<<< HEAD
-=======
-//route admin
-app.get('/admin', function(req, res){
-  res.render('admin');
-})
 
->>>>>>> 9f8aae8ff017ac55b50d223011e80d00c2ca20f6
+
 
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {
   res.render('about', { page: '3' });
 });
 
+
 // route contact
 app.get('/contact', function (req, res) {
   res.render('contact');
+});
+
+app.get('/profile', function (req, res) {
+  res.render('profile');
 });
 const contactmessage = require('./model/contact');
 app.post('/contact', async function (req, res) {

@@ -38,25 +38,31 @@ const acount = mongoose.Schema({
     required: true,
   },
   ngaytao: {
-    type: Date
+    type: Date,
   },
   ngaycapnhat: {
     type: Date,
-    default: Date.now,
+  },
+  block: {
+    type: Boolean,
+    require:true
   },
 });
 
 module.exports = mongoose.model('account', acount);
-// const user = new ac({
-//   tennv: e,
-//   email: e,
-//   sdt: e,
-//   gioitinh: e,
-//   diachi: e,
-//   chucvu: e,
-//   taikhoan: e,
-//   matkhau: e,
+// const date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+// const user = new acount({
+//   tennv: "pham nguyen tiep",
+//   email: "tiep@gmail.com",
+//   sdt: "0123456789",
+//   gioitinh: "nam",
+//   diachi: "11 22 3 3",
+//   chucvu: "admin",
+//   taikhoan: "tiep@gmail.com",
+//   matkhau: "1",
 //   ngaytao: date,
+//   ngaycapnhat:date,
 //   luongcoban: 15000,
+//   block :true
 // });
 // user.save();

@@ -4,6 +4,11 @@ const app = express();
 const ejs = require('ejs');
 const mongodb = require('mongoose');
 const cors = require('cors');
+const csrf = require('csurf');
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+const csrfProctection = csrf({ cookie: true });
+
 require('dotenv/config');
 
 var router = require('express').Router();
@@ -22,7 +27,6 @@ mongodb
   });
 var path = require('path');
 
-
 /// middleware
 app.use(express.static('./public'));
 //app.use(express.static(path.join(__dirname, 'public')));
@@ -32,13 +36,12 @@ const mongostore = require('connect-mongo')(session);
 
 app.use(
   session({
-    secret: 'nguyenngoctien',
+    secret: 'mysupersecret',
     saveUninitialized: true,
     resave: true,
     // resave: true,
-    store: new mongostore({ mongooseConnection: mongodb.connection })
-    // ,
-    // cookie: { maxAge: 1000 * 60 * 60 },
+    store: new mongostore({ mongooseConnection: mongodb.connection }),
+    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 * 60 },
   })
 );
 
@@ -53,7 +56,7 @@ const schema = require('./model/schema');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-var urlencodedParser = bodyParser.urlencoded({ extended: true });
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
 const mongoosePaginate = require('mongoose-paginate-v2');
@@ -92,9 +95,15 @@ app.get('/', async (req, res) => {
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
-  res.render('index', { listsp: data, listspnoibat: data2, message: '',session:req.session.cart || cartnull});
+  res.render('index', {
+    listsp: data,
+    listspnoibat: data2,
+    message: '',
+    session: req.session.cart || cartnull,
+  });
   //console.log(session.cart);
 });
+
 app.get('/index', async (req, res) => {
   const data = await dssanpham.find({
     trangthai: 'con',
@@ -105,7 +114,12 @@ app.get('/index', async (req, res) => {
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
-  res.render('index', { listsp: data, listspnoibat: data2, message: '',session:req.session.cart || cartnull });
+  res.render('index', {
+    listsp: data,
+    listspnoibat: data2,
+    message: '',
+    session: req.session.cart || cartnull,
+  });
 });
 
 // route blog detail
@@ -118,12 +132,12 @@ app.get('/blog-details', function (req, res) {
 //   lean: true,
 //   limit: 20,
 // };
-app.get('/shop-grid',async function (req, res, next) {
+app.get('/shop-grid', async function (req, res, next) {
   var filter;
   var search = req.query.search || '';
   var query = '';
-  var searchbar = req.query.searchbar || "";
-  if (searchbar == "") {
+  var searchbar = req.query.searchbar || '';
+  if (searchbar == '') {
     if (search == '') {
       filter = { sl: { $regex: /[^0]/, $options: 'm' } };
       query = '';
@@ -150,7 +164,7 @@ app.get('/shop-grid',async function (req, res, next) {
     },
   };
   //console.log(filter);
-  await allsp.paginate(filter,options, function (err, result) {
+  await allsp.paginate(filter, options, function (err, result) {
     if (err) {
       console.log(err);
     } else {
@@ -162,11 +176,10 @@ app.get('/shop-grid',async function (req, res, next) {
         total: result.totalDocs,
         nextPage: result.hasNextPage,
         perPage: result.hasPrevPage,
-        session:req.session.cart || cartnull
+        session: req.session.cart || cartnull,
       });
     }
-  })
-
+  });
 
   // await allsp
   //       .find(filter)
@@ -187,7 +200,6 @@ app.get('/shop-grid',async function (req, res, next) {
 });
 //app.use(mainroutes);
 
-
 //route shopping cart
 
 // app.use(passport.session());
@@ -197,9 +209,14 @@ app.get('/shop-grid',async function (req, res, next) {
 // });
 
 app.get('/shoping-cart', function (req, res, next) {
-  var cart = new Cart(req.session.cart ||{});
+  var cart = new Cart(req.session.cart || {});
   console.log(cart.genetateArr());
-  res.render('shoping-cart', { session: req.session.cart || cartnull ,getcart: cart.genetateArr()||[],subtotal:cart.totalPrice || 0,phantram : 0});
+  res.render('shoping-cart', {
+    session: req.session.cart || cartnull,
+    getcart: cart.genetateArr() || [],
+    subtotal: cart.totalPrice || 0,
+    phantram: 0,
+  });
 });
 
 app.get('/add-to-cart', function (req, res) {
@@ -213,17 +230,15 @@ app.get('/add-to-cart', function (req, res) {
       return res.redirect('/');
     }
     var giasell;
-    if(product.hieuluc==="con")
-      giasell = product.gia - (product.gia * product.phantram / 100);
+    if (product.hieuluc === 'con')
+      giasell = product.gia - (product.gia * product.phantram) / 100;
     else giasell = product.gia;
-    cart.add(product, product._id,sl,giasell);
+    cart.add(product, product._id, sl, giasell);
     req.session.cart = cart;
-    console.log(req.session.cart);   
+    console.log(req.session.cart);
     res.redirect('/');
-  })
-
-})
-
+  });
+});
 
 //route shop details
 var ObjectId = require('mongodb').ObjectID;
@@ -231,18 +246,20 @@ var getitem = require('./model/sanpham');
 app.get('/shop-details', function (req, res) {
   var id = req.query.id;
   var o_id = new ObjectId(id);
-  getitem.findOne({ _id: o_id }).then(docs => {
-    var sp = docs;
-    res.render('shop-details', {
-      sp: sp,
-      session: req.session.cart || cartnull,
+  getitem
+    .findOne({ _id: o_id })
+    .then((docs) => {
+      var sp = docs;
+      res.render('shop-details', {
+        sp: sp,
+        session: req.session.cart || cartnull,
+      });
+    })
+    .catch((err) => {
+      next(err);
     });
-  }).catch(err => {
-    next(err);
-  });;
-  //console.log(item); 
+  //console.log(item);
 });
-
 
 //route blog
 app.get('/blog', function (req, res) {
@@ -252,24 +269,42 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout', { session: req.session.cart || cartnull });
 });
+
 //route admin
-app.get('/admin', function(req, res){
+app.get('/admin', function (req, res) {
   res.render('login');
+});
+app.get('/hoadon', function (req, res) {
+  res.render('hoadon');
 })
+app.get('/qlsanpham',async function (req, res) {
+  const spl = await allsp.find({});
+  console.log(spl);
+  res.render('qlsanpham',{data:spl});
+});
 //route admin
 const ac = require('./model/accout');
-app.post('/admin',function (req, res) {
+app.post('/admin', function (req, res) {
   // create user in req.body
   const e = req.body.username;
   const pw = req.body.password;
   console.log(e);
   console.log(pw);
-  const user = ac.findOne({ email: e,matkhau:pw }, (err, result) => {
+  const dataac = [];
+  ac.find({}).exec((err, result) => {
+    dataac.push(result);
+  });
+  const user = ac.findOne({ email: e, matkhau: pw }, (err, result) => {
     if (err) {
       throw err;
-    };
+    }
     if (result) {
-      res.render('admin');
+      if (result.chucvu == 'admin') {
+        console.log(dataac);
+        res.render('taikhoan',{dataac : dataac});
+      } else if (result.chucvu == 'nhanvien') {
+        res.render('qlsanpham');
+      }
     } else {
       res.redirect('/admin');
     }
@@ -285,6 +320,10 @@ app.get('/about', function (req, res) {
 // route contact
 app.get('/contact', function (req, res) {
   res.render('contact', { session: req.session.cart || cartnull });
+});
+
+app.get('/profile', function (req, res) {
+  res.render('profile');
 });
 const contactmessage = require('./model/contact');
 app.post('/contact', async function (req, res) {
@@ -307,15 +346,15 @@ app.post('/contact', async function (req, res) {
 
 //
 const coupon = require('./model/coupon');
-app.post('/add-coupon',async function (req, res) {
+app.post('/add-coupon', async function (req, res) {
   const mac = req.body.coupon;
   const newcoupon = await coupon.find({ ma: mac });
   console.log(newcoupon[0].phantram);
   var cart = new Cart(req.session.cart || {});
-   res.render('shoping-cart', {
-     session: req.session.cart || cartnull,
-     getcart: cart.genetateArr() || [],
-     subtotal: cart.totalPrice || 0,
-     phantram: newcoupon[0].phantram,
-   });
-})
+  res.render('shoping-cart', {
+    session: req.session.cart || cartnull,
+    getcart: cart.genetateArr() || [],
+    subtotal: cart.totalPrice || 0,
+    phantram: newcoupon[0].phantram,
+  });
+});

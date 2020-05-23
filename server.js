@@ -6,9 +6,7 @@ const mongodb = require('mongoose');
 const cors = require('cors');
 const csrf = require('csurf');
 var cookieParser = require('cookie-parser');
-app.use(cookieParser());
 const csrfProctection = csrf({ cookie: true });
-
 require('dotenv/config');
 
 var router = require('express').Router();
@@ -55,7 +53,8 @@ const schema = require('./model/schema');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
+app.use(cookieParser());
+// app.use(csrfProctection);
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 // this middleware use to build restful api so need this line to fix 'no access control allow origin' OK
 app.use(cors());
@@ -92,6 +91,7 @@ app.get('/', async (req, res) => {
     sl: { $regex: /[^0]/, $options: 'm' },
   });
   const data2 = await dsspnoibat.find({
+    trangthai: 'con',
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
@@ -111,6 +111,7 @@ app.get('/index', async (req, res) => {
     sl: { $regex: /[^0]/, $options: 'm' },
   });
   const data2 = await dsspnoibat.find({
+    trangthai: 'con',
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
@@ -164,6 +165,7 @@ app.get('/shop-grid', async function (req, res, next) {
     },
   };
   //console.log(filter);
+  filter.trangthai = "con";
   await allsp.paginate(filter, options, function (err, result) {
     if (err) {
       console.log(err);
@@ -210,7 +212,7 @@ app.get('/shop-grid', async function (req, res, next) {
 
 app.get('/shoping-cart', function (req, res, next) {
   var cart = new Cart(req.session.cart || {});
-  console.log(cart.genetateArr());
+  //console.log(cart.genetateArr());
   res.render('shoping-cart', {
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],
@@ -278,8 +280,8 @@ app.get('/hoadon', function (req, res) {
   res.render('hoadon');
 })
 app.get('/qlsanpham',async function (req, res) {
-  const spl = await allsp.find({});
-  console.log(spl);
+  const spl = await allsp.find({}).sort({ sl: 1 });
+  //console.log(spl);
   res.render('qlsanpham',{data:spl});
 });
 //route admin
@@ -300,10 +302,10 @@ app.post('/admin', function (req, res) {
     }
     if (result) {
       if (result.chucvu == 'admin') {
-        console.log(dataac);
+        //console.log(dataac);
         res.render('taikhoan',{dataac : dataac});
       } else if (result.chucvu == 'nhanvien') {
-        res.render('qlsanpham');
+         res.redirect('/qlsanpham');
       }
     } else {
       res.redirect('/admin');
@@ -357,4 +359,97 @@ app.post('/add-coupon', async function (req, res) {
     subtotal: cart.totalPrice || 0,
     phantram: newcoupon[0].phantram,
   });
+});
+
+
+
+
+
+
+
+
+
+
+
+// ajax route 
+app.put('/updatephantram',async (req, res) => {
+  var id = req.body.id;
+  var phantram = req.body.phantram;
+  var old;  
+  var phantramold =await allsp.findById({ _id: new ObjectId(id) }, (err, result) => {
+    old = result.phantram;
+  });
+
+  if (phantram >= 0 && phantram <= 100) {
+    allsp.findByIdAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { phantram: phantram } },
+      { new: true },
+      (err, doc) => {
+        if (err) {
+          console.log('update false');
+        }
+        console.log(old);
+      }
+    );
+    res.send({ message: 'Update success !!!',status:1});
+  } else {
+    res.send({ message: 'Somethong wrong !!!', status: 0, old:old });
+  }
+})
+
+app.put('/updatenoibat',async (req, res) => {
+  var id = req.body.id;
+  var noibat = req.body.noibat;
+  console.log(id, noibat);
+  allsp.findByIdAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: { noibat: !noibat } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        res.send({ message: 'Update success !!!' });
+      }
+      res.send({ message: 'Update success !!!' });
+    }
+  );
+})
+
+
+app.put('/updatetrangthai', async (req, res) => {
+  var id = req.body.id;
+  var status = req.body.status;
+  if (status == "Hết") {
+    status = "con";
+  } else status = "het";
+  console.log(id, status);
+  allsp.findByIdAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: { trangthai: status } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        res.send({ message: 'Update success !!!' });
+      }
+      res.send({ message: 'Update success !!!' });
+    }
+  );
+});
+
+app.put('/updatehieuluc', async (req, res) => {
+  var id = req.body.id;
+  var status = req.body.hieuluc;
+
+  console.log(id, status);
+  allsp.findByIdAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: { hieuluc: status } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        res.send({ message: 'Update success !!!' });
+      }
+      res.send({ message: 'Update success !!!' });
+    }
+  );
 });

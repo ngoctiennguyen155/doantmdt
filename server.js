@@ -381,12 +381,18 @@ app.get('/thongke', (req, res) => {
   res.render('thongke');
 })
 
-app.get('/mail', (req, res) => {
-  res.render('mail');
+app.get('/mail',async (req, res) => {
+  const mailschema = require('./model/mail');
+  const getmail =await mailschema.find({});
+  console.log(getmail);
+  res.render('mail',{mail : getmail});
 });
 
-app.get('/mailcontact', (req, res) => {
-  res.render('mailcontact');
+app.get('/mailcontact', async (req, res) => {
+  const mailcontactschema = require('./model/contact');
+  const getmailcontact = await mailcontactschema.find({});
+  console.log(getmailcontact);
+  res.render('mailcontact',{mailcontact : getmailcontact});
 });
 
 

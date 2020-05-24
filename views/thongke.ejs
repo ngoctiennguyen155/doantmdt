@@ -77,7 +77,7 @@ The above copyright notice and this permission notice shall be included in all c
             </a>
           </li> -->
             <li class="nav-item active">
-              <a class="nav-link" href='/thongke'>
+              <a class="nav-link" href="/thongke">
                 <i class="material-icons">dashboard</i>
                 <p>Thống kê</p>
               </a>
@@ -129,7 +129,7 @@ The above copyright notice and this permission notice shall be included in all c
         >
           <div class="container-fluid">
             <div class="navbar-wrapper">
-              <a class="navbar-brand" href="javascript:;">Hóa đơn</a>
+              <a class="navbar-brand" href="javascript:;">Thống kê</a>
             </div>
             <button
               class="navbar-toggler"
@@ -221,72 +221,78 @@ The above copyright notice and this permission notice shall be included in all c
               <div class="col-md-12">
                 <div class="card">
                   <div class="card-header card-header-primary">
-                    <h4 class="card-title">Bảng hóa đơn</h4>
-                    <p class="card-category">Quản lí các thông tin hóa đơn</p>
+                    <h4 class="card-title">Bảng thống kê</h4>
+                    <p class="card-category">Quản lí các thông số cơ bản</p>
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
-                      <table class="table">
-                        <thead class="text-primary">
-                          <th>
-                            ID
-                          </th>
-                          <th>
-                            Tên SP
-                          </th>
-                          <th>
-                            Ảnh SP
-                          </th>
-                          <th>
-                            Chi tiết
-                          </th>
-                          <th>
-                            Giá
-                          </th>
-                          <th>
-                            Mã loại SP
-                          </th>
-                          <th>
-                            SL
-                          </th>
-                          <th>
-                            HSD
-                          </th>
-                          <th>
-                            Phần trăm
-                          </th>
-                          <th>
-                            Trạng thái
-                          </th>
-                          <th>
-                            Hiệu lực
-                          </th>
-                          <th>
-                            Nổi bật
-                          </th>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>
-                              1
-                            </td>
-                            <td>
-                              Dakota Rice
-                            </td>
-                            <td>
-                              Niger
-                            </td>
-                            <td>
-                              Oud-Turnhout
-                            </td>
-                            <td class="text-primary">
-                              $36,738
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <div class="container">
+                        <div class="row">
+                          <div
+                            class="col-lg-9"
+                            style="height: 35em; margin-right: 0px;"
+                          >
+                            <div class="dropdown">
+                              <button
+                                class="btn dropdown-toggle"
+                                type="button"
+                                data-toggle="dropdown"
+                                style="border: none; box-shadow: none;"
+                              >
+                                Năm
+                              </button>
+                              <div
+                                class="dropdown-menu"
+                                aria-labelledby="dropdownMenuButton"
+                              >
+                                <a class="dropdown-item" href="#">2018</a>
+                                <a class="dropdown-item" href="#">2019</a>
+                                <a class="dropdown-item" href="#">2020</a>
+                              </div>
+                            </div>
+                            <canvas id="myChart"></canvas>
+                          </div>
+                          <!-- <div class="col-lg-1">
+
+                          </div> -->
+                          <div class="col-lg-3" style="height: 32em;">
+                            <div style="background-color: aqua; height: 8em;">
+                              Tổng sản phẩm bán ra
+                            </div>
+                            <div
+                              style="
+                                background-color: rgba(255, 0, 26, 1);
+                                height: 8em;
+                                margin-top: 1em;
+                              "
+                            >
+                              Đơn hàng
+                            </div>
+                            <div
+                              style="
+                                background-color: rgba(56, 172, 255, 1);
+                                height: 8em;
+                                margin-top: 1em;
+                              "
+                            >
+                              Mail sub
+                            </div>
+                            <div
+                              style="
+                                background-color: rgba(255, 133, 133, 1);
+                                height: 8em;
+                                margin-top: 1em;
+                                color: black;
+                              "
+                            >
+                              Mail contact
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>< -->
                 </div>
               </div>
               <div class="col-md-12">
@@ -295,138 +301,12 @@ The above copyright notice and this permission notice shall be included in all c
                   <h4 class="card-title mt-0"> Bảng sản phẩm</h4>
                   <p class="card-category"> Quản lí các thông tin sản phẩm</p>
                 </div> -->
-                  <!-- <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover">
-                      <thead class="">
-                        <th>
-                          ID
-                        </th>
-                        <th>
-                          Name
-                        </th>
-                        <th>
-                          Country
-                        </th>
-                        <th>
-                          City
-                        </th>
-                        <th>
-                          Salary
-                        </th>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            1
-                          </td>
-                          <td>
-                            Dakota Rice
-                          </td>
-                          <td>
-                            Niger
-                          </td>
-                          <td>
-                            Oud-Turnhout
-                          </td>
-                          <td>
-                            $36,738
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            2
-                          </td>
-                          <td>
-                            Minerva Hooper
-                          </td>
-                          <td>
-                            Curaçao
-                          </td>
-                          <td>
-                            Sinaai-Waas
-                          </td>
-                          <td>
-                            $23,789
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            3
-                          </td>
-                          <td>
-                            Sage Rodriguez
-                          </td>
-                          <td>
-                            Netherlands
-                          </td>
-                          <td>
-                            Baileux
-                          </td>
-                          <td>
-                            $56,142
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            4
-                          </td>
-                          <td>
-                            Philip Chaney
-                          </td>
-                          <td>
-                            Korea, South
-                          </td>
-                          <td>
-                            Overland Park
-                          </td>
-                          <td>
-                            $38,735
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            5
-                          </td>
-                          <td>
-                            Doris Greene
-                          </td>
-                          <td>
-                            Malawi
-                          </td>
-                          <td>
-                            Feldkirchen in Kärnten
-                          </td>
-                          <td>
-                            $63,542
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            6
-                          </td>
-                          <td>
-                            Mason Porter
-                          </td>
-                          <td>
-                            Chile
-                          </td>
-                          <td>
-                            Gloucester
-                          </td>
-                          <td>
-                            $78,615
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div> -->
                 </div>
               </div>
             </div>
           </div>
         </div>
+
         <footer class="footer">
           <div class="container-fluid">
             <nav class="float-left"></nav>
@@ -556,6 +436,7 @@ The above copyright notice and this permission notice shall be included in all c
     ></script>
     <!-- Material Dashboard DEMO methods, don't include it in your project! -->
     <script src="../assets/demo/demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script>
       $(document).ready(function () {
         $().ready(function () {
@@ -751,6 +632,77 @@ The above copyright notice and this permission notice shall be included in all c
             }, 1000);
           });
         });
+      });
+
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+          labels: [
+            'Tháng 1',
+            'Tháng 2',
+            'Tháng 3',
+            'Tháng 4',
+            'Tháng 5',
+            'Tháng 6',
+            'Tháng 7',
+            'Tháng 8',
+            'Tháng 9',
+            'Tháng 10',
+            'Tháng 11',
+            'Tháng 12',
+          ],
+          datasets: [
+            {
+              label: 'Đơn hàng',
+              fill: false,
+              LineTension: 0.1,
+              backgroundColor: 'rgba(255, 0, 26, 1)',
+              borderColor: 'rgba(255, 0, 26, 1)',
+              borderCapStyle: 'butt',
+              data: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
+            },
+            {
+              label: 'Mail sub',
+              fill: false,
+              LineTension: 0.1,
+              backgroundColor: 'rgba(56, 172, 255, 1)',
+              borderColor: 'rgba(56, 172, 255, 1)',
+              borderCapStyle: 'butt',
+              // backgroundColor: "none",
+              // borderColor: 'rgb(255, 99, 132)',
+              data: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
+            },
+            {
+              label: 'Mail contact',
+              fill: false,
+              LineTension: 0.1,
+              backgroundColor: 'rgba(255, 133, 133, 1)',
+              borderColor: 'rgba(255, 133, 133, 1)',
+              borderCapStyle: 'butt',
+              // backgroundColor: "none",
+              // borderColor: 'rgb(255, 99, 132)',
+              data: [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65],
+            },
+            {
+              label: 'Tổng sản phẩm bán ra',
+              fill: false,
+              LineTension: 0.1,
+              backgroundColor: 'aqua',
+              borderColor: 'aqua',
+              borderCapStyle: 'butt',
+              // backgroundColor: "none",
+              // borderColor: 'rgb(255, 99, 132)',
+              data: [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 100],
+            },
+          ],
+        },
+
+        // Configuration options go here
+        options: {},
       });
     </script>
   </body>

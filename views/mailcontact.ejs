@@ -129,7 +129,7 @@ The above copyright notice and this permission notice shall be included in all c
         >
           <div class="container-fluid">
             <div class="navbar-wrapper">
-              <a class="navbar-brand" href="javascript:;">Hóa đơn</a>
+              <a class="navbar-brand" href="javascript:;">Mail Contact</a>
             </div>
             <button
               class="navbar-toggler"
@@ -170,16 +170,9 @@ The above copyright notice and this permission notice shall be included in all c
                     Stats
                   </p>
                 </a>
-<<<<<<< HEAD:views/admin.ejs
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
-=======
               </li> -->
                 <!-- <li class="nav-item dropdown">
                 <a class="nav-link" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
->>>>>>> 647ac39be7783411e21504d18fa71384f766b2b7:views/hoadon.ejs
                   <i class="material-icons">notifications</i>
                   <span class="notification">5</span>
                   <p class="d-lg-none d-md-block">
@@ -228,68 +221,55 @@ The above copyright notice and this permission notice shall be included in all c
               <div class="col-md-12">
                 <div class="card">
                   <div class="card-header card-header-primary">
-                    <h4 class="card-title">Bảng hóa đơn</h4>
-                    <p class="card-category">Quản lí các thông tin hóa đơn</p>
+                    <h4 class="card-title">Bảng tương tác</h4>
+                    <p class="card-category">Danh sách các tương tác từ khách hàng</p>
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
                       <table class="table">
                         <thead class="text-primary">
                           <th>
-                            ID
+                            STT
                           </th>
                           <th>
-                            Tên SP
+                            Tên khách hàng
                           </th>
                           <th>
-                            Ảnh SP
+                            Email
                           </th>
                           <th>
-                            Chi tiết
+                            Nội dung
                           </th>
                           <th>
-                            Giá
+                            Ngày gửi
                           </th>
                           <th>
-                            Mã loại SP
-                          </th>
-                          <th>
-                            SL
-                          </th>
-                          <th>
-                            HSD
-                          </th>
-                          <th>
-                            Phần trăm
-                          </th>
-                          <th>
-                            Trạng thái
-                          </th>
-                          <th>
-                            Hiệu lực
-                          </th>
-                          <th>
-                            Nổi bật
+                            Gửi mail
                           </th>
                         </thead>
                         <tbody>
-                          <tr>
+                          <%var stt=0; mailcontact.forEach(e=>{stt++; %>
+                            <tr>
                             <td>
-                              1
+                              <%=stt%>
                             </td>
                             <td>
-                              Dakota Rice
+                              <%=e.name%>
                             </td>
                             <td>
-                              Niger
+                              <%=e.email%>
                             </td>
                             <td>
-                              Oud-Turnhout
+                              <%=e.message%>
                             </td>
                             <td class="text-primary">
-                              $36,738
+                              <%=e.date%>
+                            </td>
+                            <td class="text-primary">
+                              <i class="fa fa-paper-plane" aria-hidden="true" style="color: skyblue; font-size: 20px;"></i>
                             </td>
                           </tr>
+                          <%})%>
                         </tbody>
                       </table>
                     </div>

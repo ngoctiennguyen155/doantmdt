@@ -36,7 +36,12 @@
           </p>
           <span>
             <form>
-              <input type="text" id="email" placeholder="Enter your mail" />
+              <input
+                type="text"
+                id="email"
+                class="emails"
+                placeholder="Enter your mail"
+              />
               <input
                 type="button"
                 id="btn"
@@ -79,32 +84,36 @@
   </div>
 </footer>
 <script>
-  $('#btn').click(function () {
-    check();
-  });
-
-  function check() {
-    var restURL =
-      'http://apilayer.net/api/check?access_key=04f4983ef5dee6eb3c0f7f68c015e759&email=' +
-      $('#email').val() +'&smtp=1&format =1';
-    $.ajax({
-      type: 'get',
-      url: restURL,
-      dataType: 'json',
-      success: renderList,
+  $(document).ready(function () {
+    $("#btn"). click(function(){
+      var str = $(".emails"). val();
+     
+      $.ajax({
+        url : '/validateemail',
+        method: "POST",
+        contentType :"application/json",
+        data : JSON.stringify({email :str}),
+        success :(res)=>{
+          if(res){
+            //alert('true');
+            $('.textsub').text('Thanks for your subcribe <3 !!!');
+            $('#id01').css({"display" : "block"});
+            $.ajax({
+              url : '/mailsub',
+              method: "POST",
+              contentType : "application/json",
+              data : JSON.stringify({email : str}),
+              success : (res)=>{
+                if(res==="successsub")
+                window.location.href='http://localhost:3000/';
+              }
+            })
+          }else {
+            $('.textsub').text('Email not exist !!!!');
+            $('#id01').css({"display" : "block"});
+          }
+        }
+      })
     });
-    return false;
-  }
-
-  function renderList(data) {
-    if (data.format_valid == true && data.smtp_check == true) {
-      $('#id01').css('display', 'block');
-      document.querySelector('.textsub').innerHTML =
-        '<p>Thanks for your subcribe <3 !!!</p>';
-    } else {
-      $('#id01').css('display', 'block');
-      document.querySelector('.textsub').innerHTML =
-        '<p>Email not exist !!!</p>';
-    }
-  }
+});
 </script>

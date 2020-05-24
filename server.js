@@ -335,7 +335,6 @@ app.post('/contact', async function (req, res) {
     message: req.body.message,
   });
   newcontact.save();
-
   const data = await dssanpham.find({ trangthai: 'con', hieuluc: 'con' });
   const data2 = await dsspnoibat.find({ noibat: true });
   res.render('index', {
@@ -345,7 +344,23 @@ app.post('/contact', async function (req, res) {
     session: req.session.cart || cartnull,
   });
 });
-
+app.post('/mailsub',async (req, res) => {
+  var email = req.body.email;
+  const e = require('./model/mail');
+  const newe = new e({
+    email: email
+  })
+  newe.save();
+  res.send('successsub');
+})
+app.post('/validateemail', (req, res) => {
+  var email = req.body.email;
+  console.log(email);
+  const emailExistence = require('email-existence');
+  emailExistence.check(email, function (error, response) {
+    res.send(response);
+  });
+})
 //
 const coupon = require('./model/coupon');
 app.post('/add-coupon', async function (req, res) {
@@ -361,11 +376,18 @@ app.post('/add-coupon', async function (req, res) {
   });
 });
 
+// admin route
+app.get('/thongke', (req, res) => {
+  res.render('thongke');
+})
 
+app.get('/mail', (req, res) => {
+  res.render('mail');
+});
 
-
-
-
+app.get('/mailcontact', (req, res) => {
+  res.render('mailcontact');
+});
 
 
 

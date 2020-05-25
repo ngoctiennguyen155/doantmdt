@@ -134,7 +134,7 @@ The above copyright notice and this permission notice shall be included in all c
         >
           <div class="container-fluid">
             <div class="navbar-wrapper">
-              <a class="navbar-brand" href="javascript:;" id="themmagiamgia"
+              <a style="padding: 10px;" class="navbar-brand" href="javascript:;" id="themmagiamgia"
                 >Thêm mã giảm giá <i class="fas fa-plus-square"></i
               ></a>
             </div>
@@ -231,12 +231,8 @@ The above copyright notice and this permission notice shall be included in all c
                   <div class="card-header card-header-primary">
                     <h4 class="card-title">Mã giảm giá</h4>
                     <p class="card-category">Quản lí các mã giảm giá</p>
-                  </div>
-               
-                  <div class="card-body">
-                    <div class="table-responsive">
-                         <div id="id01" class="w3-modal" style="display: none;">
-    <div class="w3-modal-content" style="width: 400px;position: absolute;margin-left: 20em;margin-top: unset;">
+                    <div id="id01" class="w3-modal" style="display: none;margin-top: 0px;margin-left: 20em;">
+    <div class="w3-modal-content" style="width: 400px;position: absolute;">
       <div class="modal-content ">
         <div class="modal-header">
           <p><h6 style="font-family: Cairo", sans-serif;"><img style="height: 40px;;" src="img/logo.png" /></h6></p>
@@ -247,10 +243,15 @@ The above copyright notice and this permission notice shall be included in all c
           
         </div>
         <div class="modal-body text-primary">
-         <form style="text-align: center;">
-              <label for="">Số lượng cần tạo: </label>
-              <input type="number" min="0" max="20" value="0" style="margin-left: 10px;margin-right: 10px;"> 
-              <input type="submit" value="Tạo" style="background-color: #0c7cd5;border-color: #0c7cd5;">
+         <form style="text-align: center;" id="formcreate">
+          <div style="text-align: left;margin: 10px;">
+               <label for="" style="width: 50%;">Số lượng cần tạo: </label>
+              <input id="inputgiamgia" style="width: 20%;" type="number" min="0" max="20" value="0" style="margin-left: 10px;margin-right: 10px;"></br>
+              <label for="" style="width: 50%;">Phần trăm giảm giá: </label>
+              <input style="width: 20%;" id="phantramgiamgia" type="number" min="1" max="100" value="0" style="margin-left: 10px;margin-right: 10px;"> 
+          </div>
+  
+              <input id="btngiamgia" type="button" style="width: 50%;background-color: #0c7cd5;border-color: #0c7cd5;text-align: center;" value="Tạo" ></input>
          </form>
         </div>
         <div class="modal-footer">
@@ -262,6 +263,11 @@ The above copyright notice and this permission notice shall be included in all c
       </div>
     </div>
   </div>
+                  </div>
+               
+                  <div class="card-body">
+                    <div class="table-responsive">
+                         
                       <table class="table">
                         <thead class="text-primary">
                           <th>
@@ -279,7 +285,29 @@ The above copyright notice and this permission notice shall be included in all c
                           
                         </thead>
                         <tbody>
-                          <!--  -->
+                          <%var run=0; data.forEach(e=>{run++; %>
+                              <tr>
+                          <td>
+                            <%=run%>
+                          </td>
+                          <td>
+                           <%=e.ma%>
+                          </td>
+                          <td>
+                            <%=e.phantram%>
+                          </td>
+                          <td>
+                            <%if(e.trangthai==0){%>
+                              Chưa sử dụng
+                            <%}else if(e.trangthai==1){%>
+                              Đã tặng
+                              <%}else {%>
+                                   Đã sử dụng
+                                   <%}%>
+                          </td>
+                         
+                        </tr>
+                          <%})%>
                         </tbody>
                       </table>
                     </div>
@@ -754,6 +782,25 @@ The above copyright notice and this permission notice shall be included in all c
          $(document).ready(()=>{
               $('#themmagiamgia').click(()=>{
                    $('#id01').css("display","block");
+              })
+              $("#btngiamgia").click(()=>{
+                   var sl=$('#inputgiamgia').val();
+                   var phantram=$('#phantramgiamgia').val();
+                   if(Number(sl)<=0 || Number(sl)>20 || Number(phantram) <=0 || Number(phantram) >100){
+                        alert('UP something wrong !!!');
+                   }else{
+                        $.ajax({
+                             url : '/creatcoupon',
+                             method: 'POST',
+                             contentType : "application/json",
+                             data :JSON.stringify({sl : sl,phantram:phantram}),
+                             success : (res)=>{
+                                  alert(res);
+                                  $('#id01').click();
+                                  window.location.href = 'http://localhost:3000/magiamgia';
+                             }
+                        })
+                   }
               })
          })
     </script>

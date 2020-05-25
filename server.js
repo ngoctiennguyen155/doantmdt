@@ -5,6 +5,7 @@ const ejs = require('ejs');
 const mongodb = require('mongoose');
 const cors = require('cors');
 const csrf = require('csurf');
+const bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
 require('dotenv/config');
@@ -285,35 +286,44 @@ app.get('/qlsanpham',async function (req, res) {
   res.render('qlsanpham',{data:spl});
 });
 //route admin
+const zdadsfasdfa = [];
 const ac = require('./model/accout');
-app.post('/admin', function (req, res) {
+app.post('/admin',async function (req, res) {
   // create user in req.body
   const e = req.body.username;
   const pw = req.body.password;
   console.log(e);
   console.log(pw);
-  const dataac = [];
-  ac.find({}).exec((err, result) => {
-    dataac.push(result);
-  });
-  const user = ac.findOne({ email: e, matkhau: pw }, (err, result) => {
-    if (err) {
-      throw err;
-    }
-    if (result) {
-      if (result.chucvu == 'admin') {
-        //console.log(dataac);
-        res.render('taikhoan',{dataac : dataac});
-      } else if (result.chucvu == 'nhanvien') {
-         res.redirect('/qlsanpham');
-      }
+  let dataacc = await ac.find({});
+  let dataac = [];
+  dataac[0] = dataacc;
+  let user = await ac.find({ email: e });
+ 
+  console.log(user[0].matkhau);
+  const validatehashpw = await bcrypt.compare(pw, user[0].matkhau);
+  if (validatehashpw) {
+    if (user[0].chucvu == "admin") {
+      zdadsfasdfa[1] = user[0].email;
+      res.render('taikhoan', { dataac: dataac,user:user[0].email });
+    } else if (user[0].chucvu == "nhanvien") {
+      res.render('thongke');
     } else {
       res.redirect('/admin');
     }
-  });
+  } else {
+    res.redirect('/admin');
+  }
+  
 });
 ////
 
+app.get('/taikhoan', async (req, res) => {
+  const dataac = await ac.find({});
+  //console.log(dataac);
+  zdadsfasdfa[0] = dataac;
+  res.render('taikhoan', { dataac: zdadsfasdfa,user:zdadsfasdfa[1]});
+});
+//
 app.get('/main', function (req, res) {});
 app.get('/about', function (req, res) {
   res.render('about', { page: '3', session: req.session.cart || cartnull });
@@ -398,9 +408,13 @@ app.get('/mailcontact', async (req, res) => {
   console.log(getmailcontact);
   res.render('mailcontact',{mailcontact : getmailcontact});
 });
-app.get('/magiamgia', (req, res) => {
-  res.render('magiamgia');
-})
+app.get('/magiamgia', async (req, res) => {
+  const coupon = require('./model/coupon');
+  const datacoupon = await coupon.find({}).sort({ trangthai: 1,phantram:1 });
+  console.log(datacoupon);
+  res.render('magiamgia', { data: datacoupon });
+});
+
 
 
 
@@ -486,4 +500,99 @@ app.put('/updatehieuluc', async (req, res) => {
       res.send({ message: 'Update success !!!' });
     }
   );
+});
+
+
+app.post('/creatcoupon', (req, res) => {
+  var sl = req.body.sl;
+  var phantram = req.body.phantram;
+  //console.log(sl);
+  const randomString = require('randomstring');
+  const newcoupon = require('./model/coupon');
+  for (var i = 1; i <= sl; i++){
+    var z = new newcoupon({
+      ma: randomString.generate({
+        length: 7,
+        charset: 'alphanumeric',
+      }),
+      phantram: phantram,
+      trangthai:0
+    });
+    z.save();
+  }
+  res.send('Create Success !!!');
+})
+
+app.put('/updateblockaccout', async (req, res) => {
+  let id = req.body.id;
+  let block = req.body.status;
+
+  ac.findByIdAndUpdate({ _id: new ObjectId(id) },
+    { $set: { block: block } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        console.log(err);
+      }
+      if(block)
+        res.send({ message: 'Blocked !!!' });
+      else res.send({ message: 'UnBlocked !!!' });
+    });
+});
+
+app.put('/createaccout', async (req, res) => {
+  let loai = req.body.loai;
+  let tennv = req.body.tennv;
+  let email = req.body.email;
+  let sdt = req.body.sdt;
+  let chucvu = req.body.chucvu;
+ 
+  const salt =await bcrypt.genSalt(10);
+  const pwhash = await await bcrypt.hash(req.body.password, salt);
+  console.log(salt);
+  console.log(pwhash);
+  let checkmail = await ac.find({ email: email });
+  let cout = checkmail.length;
+  if (loai == "tao") {
+    let nac =await new ac({
+      tennv: tennv,
+      email: email,
+      sdt: sdt,
+      gioitinh: "nam",
+      diachi: "273 an duong vuong",
+      chucvu: chucvu,
+      taikhoan: email,
+      matkhau: await bcrypt.hash(req.body.password, salt),
+      luongcoban: "15000",
+      block: false,
+      ngaytao: Date.now(),
+      ngaycapnhat: Date.now()
+    });
+    if (cout == 0) {
+      nac.save();
+      res.send('Create account success !!!');
+    } else res.send('Email exist !!!');
+  } else {
+    let id = req.body.id;
+    await ac.findByIdAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          tennv: tennv,
+          email: email,
+          sdt: sdt,
+          gioitinh: '',
+          diachi: '',
+          chucvu: chucvu,
+          taikhoan: email,
+          matkhau: await bcrypt.hash(req.body.password, salt),
+          ngaycapnhat: Date.now()
+        },
+      }, { new: true }, (err, doc) => {
+        if (err) console.log(err);
+         res.send('Update accout success !!!');
+      }
+    );
+   
+  }
 });

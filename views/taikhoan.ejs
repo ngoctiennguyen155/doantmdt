@@ -174,6 +174,9 @@ The above copyright notice and this permission notice shall be included in all c
         </div>
       </nav>
       <!-- End Navbar -->
+
+      
+
       <div class="content">
         <div class="container-fluid">
           <div class="row">
@@ -182,62 +185,59 @@ The above copyright notice and this permission notice shall be included in all c
                 <div class="card-header card-header-primary">
                   <h4 class="card-title">Tài khoản</h4>
                   <p class="card-category">Quản lí quyền các tài khoản</p>
-                  <div id="id01" class="w3-modal" style="display: none;margin-top: 0px;margin-left: 20em;">
-                    <div class="w3-modal-content" style="width: 400px;position: absolute;">
+
+                  <div id="id01" class="w3-modal popup">
+                    <div class="w3-modal-content">
                       <div class="modal-content ">
                         <div class="modal-header">
                           <p>
-                          <h6 style="font-family: Cairo" , sans-serif;"><img style="height: 40px;;"
+                          <h6 style="font-family: Cairo , sans-serif;"><img style="height: 40px;;"
                               src="img/logo.png" /></h6>
                           </p>
                           <button onclick="document.getElementById('id01').style.display='none'" type="button"
                             class="close" data-dismiss="modal" style="font-size: 20px;">
                             &times;
                           </button>
-
+            
                         </div>
                         <div class="modal-body text-primary">
                           <p id="error"></p>
                           <form style="text-align: center;" id="formcreate">
                             <div style="text-align: left;margin: 10px;">
-                              <label for="" style="width: 30%;">Tên nhân viên: </label>
-                              <input id="tennv" style="width: 60%;" type="text" placeholder="Tên nhân viên"
-                                style="margin-left: 10px;margin-right: 10px;"></br>
-                              <label for="" style="width: 30%;">Email: </label>
-                              <input style="width: 60%;" id="email" type="text" placeholder="Email"
-                                style="margin-left: 10px;margin-right: 10px;"></br>
-                              <label for="" style="width: 30%;">Mật khẩu: </label>
-                              <input style="width: 60%;" id="password" type="password" placeholder="Mật khẩu"
-                                style="margin-left: 10px;margin-right: 10px;"></br>
-                              <label for="" style="width: 30%;padding-top: 10px;"></label>
-                              <input style="width: 60%;" id="repassword" type="password" placeholder="Nhập mật khẩu"
-                                style="margin-left: 10px;margin-right: 10px;">
+                              <label for=""  class="w30 mt5">Tên nhân viên: </label>
+                              <input id="tennv"  class="w60 mt5 ml5" type="text" placeholder="Tên nhân viên"></br>
+                              <label for=""  class="w30 mt5">Email: </label>
+                              <input  class="w60 mt5 ml5" id="email" type="text" placeholder="Email"></br>
+                              <label for=""  class="w30 mt5">Mật khẩu: </label>
+                              <input  class="w60 mt5 ml5" id="password" type="password" placeholder="Mật khẩu">
+                              <label for="" class="w30 mt5"></label>
+                              <input  class="w60 mt5 ml5" id="repassword" type="password" placeholder="Nhập mật khẩu">
                               </br>
-                              <label for="" style="width: 30%;padding-top: 8px;">SĐT: </label>
-                              <input style="width: 60%;" id="sdt" type="text" placeholder="Số điện thoại"
-                                style="margin-left: 10px;margin-right: 10px;">
+                              <label for="" class="w30 mt5">SĐT: </label>
+                              <input  class="w60 mt5 ml5" id="sdt" type="text" placeholder="Số điện thoại">
                               </br>
-                              <label class="cv" style="width: 30%;">Chức vụ: </label>
-                              <select id="selectchucvu" style="width: 60%;">
+                              <label class="cv w30 mt5"  >Chức vụ: </label>
+                              <select id="selectchucvu" style="color: #666;"  class="w60 mt5 ml5 ">
                                 <option value="nhanvien">Nhân viên</option>
                                 <option value="admin">Admin</option>
                               </select>
                             </div>
                             <input type="hidden" value="" id="id_">
                             <input id="btngiamgia" type="button"
-                              style="color: white; width: 50%;background-color: #0c7cd5;border-color: #0c7cd5;text-align: center;"
+                              class="btn btn-primary w50"
                               value="Tạo"></input>
                           </form>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-default" id="btnmail" data-dismiss="modal"
-                            onclick="document.getElementById('id01').style.display='none'" style="font-size: 15px;">
+                            onclick="document.getElementById('id01').style.display='none'" style="margin: auto;">
                             Close
                           </button>
                         </div>
                       </div>
                     </div>
                   </div>
+
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">

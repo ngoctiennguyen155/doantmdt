@@ -471,6 +471,8 @@ section {
   display: block;
 }
 
+.popup{ position: fixed; display: none;margin-top: -100px;margin-left: 20em; width: 400px}
+
 body {
   margin: 0;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -2504,6 +2506,12 @@ select.form-control-lg:not([size]):not([multiple]),
 .form-check-input:disabled~.form-check-label {
   color: #6c757d;
 }
+
+.w30{ width: 30%}
+.w50{ width: 50%}
+.w60{ width: 60%}
+.ml5{ margin-left: 5px}
+.mt5{ margin-top: 5px}
 
 .form-check-label {
   margin-bottom: 0;

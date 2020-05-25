@@ -75,12 +75,7 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Hóa đơn</p>
             </a>
          </li>
-          <!-- <li class="nav-item ">
-            <a class="nav-link" href="./icons.html">
-              <i class="material-icons">bubble_chart</i>
-              <p>Icons</p>
-            </a>
-          </li> -->
+          
           <li class="nav-item ">
             <a class="nav-link" href="/mail">
               <i class="material-icons">mail_ons</i>
@@ -93,7 +88,13 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Contact message</p>
             </a>
           </li>
-          
+
+          <li class="nav-item ">
+            <a class="nav-link" href="./coupon">
+              <i class="material-icons">bubble_chart</i>
+              <p>Mã giảm giá</p>
+            </a>
+          </li>
           <!-- <li class="nav-item active-pro ">
             <a class="nav-link" href="./upgrade.html">
               <i class="material-icons">unarchive</i>
@@ -108,7 +109,7 @@ The above copyright notice and this permission notice shall be included in all c
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
           <div class="navbar-wrapper">
-            <a class="navbar-brand" href="javascript:;"
+            <a id="themsanpham" class="navbar-brand" href="javascript:;"
                 >Thêm sản phẩm <i class="fas fa-plus-square"></i
               ></a>
           </div>
@@ -179,6 +180,55 @@ The above copyright notice and this permission notice shall be included in all c
                 <div class="card-header card-header-primary">
                   <h4 class="card-title ">Bảng sản phẩm</h4>
                   <p class="card-category"> Quản lí các thông tin sản phẩm</p>
+                  
+                  <div id="id01" class="w3-modal popup" >
+                    <div class="w3-modal-content">
+                      <div class="modal-content ">
+                        <div class="modal-header">
+                          <p>
+                          <h6 style="font-family: Cairo , sans-serif;"><img style="height: 40px;;"
+                              src="img/logo.png" /></h6>
+                          </p>
+                          <button onclick="document.getElementById('id01').style.display='none'" type="button"
+                            class="close" data-dismiss="modal" style="font-size: 20px;">
+                            &times;
+                          </button>
+
+                        </div>
+                        <div class="modal-body text-primary">
+                          <p id="error"></p>
+                          <form style="text-align: center;" id="formcreate">
+                            <div style="text-align: left;margin: 10px;">
+                              <label for="" class="w30 mt5">Tên sản phẩm: </label>
+                              <input id="tensp" class="w60 mt5 ml5" type="text" placeholder="Tên sản phẩm" ></br>
+                              <label for="" class="w30 mt5"> Ảnh: </label>
+                              <input id="anh" class="mt5 ml5 w60 "  type="file" id="img" name="img" accept="image/*">
+                              <label for="" class="w30 mt5">Giá: </label>
+                              <input class="w60 mt5 ml5" id="gia" type="password" placeholder="Giá"></br>
+                              
+                              <label class="mt5 w30" for="" >Mã loại sp: </label>
+                              <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" >
+                                <option value="0">Chọn mã sp</option>
+                                <option value="1">dog</option>
+                                <option value="2">cat</option>
+                                <option value="3">pig</option>
+                              </select>
+                            </div>
+                            <input type="hidden" value="" id="id_">
+                            <input id="btngiamgia" type="button"
+                              class="btn btn-primary w50"
+                              value="Tạo"></input>
+                          </form>
+                        </div>
+                        <div class="modal-footer" >
+                          <button type="button" class="btn btn-default" id="btnmail" data-dismiss="modal"
+                            onclick="document.getElementById('id01').style.display='none'" style="margin: auto;">
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
@@ -751,6 +801,15 @@ The above copyright notice and this permission notice shall be included in all c
              }
            }
         })
+      })
+
+      $('#themsanpham').click(() => {
+        $('#id01').css("display", "block");
+        $('#btngiamgia').val('Tạo');
+        $('#tennv').val("");
+        $('#email').val("");
+        $('#sdt').val("");
+
       })
 
       //search

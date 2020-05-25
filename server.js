@@ -280,6 +280,9 @@ app.get('/admin', function (req, res) {
 app.get('/hoadon', function (req, res) {
   res.render('hoadon');
 })
+app.get('/coupon', function(req,res){
+  res.render('coupon');
+})
 app.get('/qlsanpham',async function (req, res) {
   const spl = await allsp.find({}).sort({ sl: 1 });
   //console.log(spl);

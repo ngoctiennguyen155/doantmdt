@@ -347,10 +347,14 @@ app.post('/contact', async function (req, res) {
 app.post('/mailsub',async (req, res) => {
   var email = req.body.email;
   const e = require('./model/mail');
-  const newe = new e({
-    email: email
-  })
-  newe.save();
+  const gete = await e.find({ email: email });
+  console.log(gete);
+  if (gete.length == 0) {
+    const newe = new e({
+      email: email,
+    });
+    newe.save();
+  }
   res.send('successsub');
 })
 app.post('/validateemail', (req, res) => {
@@ -394,7 +398,9 @@ app.get('/mailcontact', async (req, res) => {
   console.log(getmailcontact);
   res.render('mailcontact',{mailcontact : getmailcontact});
 });
-
+app.get('/magiamgia', (req, res) => {
+  res.render('magiamgia');
+})
 
 
 

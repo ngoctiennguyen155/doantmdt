@@ -54,7 +54,7 @@ The above copyright notice and this permission notice shall be included in all c
     <div class="wrapper">
       <div
         class="sidebar"
-        data-color="green"
+        data-color="purple"
         data-background-color="white"
         data-image="../assets/img/sidebar-1.jpg"
       >
@@ -74,15 +74,15 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Dashboard</p>
             </a>
           </li> -->
-            <li class="nav-item active">
+            <li class="nav-item">
               <a class="nav-link" href="/taikhoan">
                 <i class="material-icons">person</i>
                 <p>Tài khoản</p>
               </a>
             </li>
 
-            <li class="nav-item">
-              <a class="nav-link" href="/magiamgia">
+            <li class="nav-item active">
+              <a class="nav-link " href="/magiamgia">
                 <i class="material-icons">content_paste</i>
                 <p>Mã giảm giá</p>
               </a>
@@ -134,8 +134,8 @@ The above copyright notice and this permission notice shall be included in all c
         >
           <div class="container-fluid">
             <div class="navbar-wrapper">
-              <a class="navbar-brand" href="javascript:;"
-                >Thêm tài khoản <i class="fas fa-plus-square"></i
+              <a class="navbar-brand" href="javascript:;" id="themmagiamgia"
+                >Thêm mã giảm giá <i class="fas fa-plus-square"></i
               ></a>
             </div>
             <button
@@ -222,89 +222,64 @@ The above copyright notice and this permission notice shall be included in all c
           </div>
         </nav>
         <!-- End Navbar -->
+         
         <div class="content">
           <div class="container-fluid">
             <div class="row">
               <div class="col-md-12">
                 <div class="card">
                   <div class="card-header card-header-primary">
-                    <h4 class="card-title">Tài khoản</h4>
-                    <p class="card-category">Quản lí quyền các tài khoản</p>
+                    <h4 class="card-title">Mã giảm giá</h4>
+                    <p class="card-category">Quản lí các mã giảm giá</p>
                   </div>
+               
                   <div class="card-body">
                     <div class="table-responsive">
+                         <div id="id01" class="w3-modal" style="display: none;">
+    <div class="w3-modal-content" style="width: 400px;position: absolute;margin-left: 20em;margin-top: unset;">
+      <div class="modal-content ">
+        <div class="modal-header">
+          <p><h6 style="font-family: Cairo", sans-serif;"><img style="height: 40px;;" src="img/logo.png" /></h6></p>
+          <button onclick="document.getElementById('id01').style.display='none'" type="button" class="close"
+            data-dismiss="modal" style="font-size: 20px;">
+            &times;
+          </button>
+          
+        </div>
+        <div class="modal-body text-primary">
+         <form style="text-align: center;">
+              <label for="">Số lượng cần tạo: </label>
+              <input type="number" min="0" max="20" value="0" style="margin-left: 10px;margin-right: 10px;"> 
+              <input type="submit" value="Tạo" style="background-color: #0c7cd5;border-color: #0c7cd5;">
+         </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id="btnmail" data-dismiss="modal"
+            onclick="document.getElementById('id01').style.display='none'" style="font-size: 15px;">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
                       <table class="table">
                         <thead class="text-primary">
                           <th>
                             ID
                           </th>
                           <th>
-                            Tên NV
+                            Mã
                           </th>
                           <th>
-                            Email
+                            Phần trăm giảm giá
                           </th>
                           <th>
-                            SĐT
+                            Trạng thái
                           </th>
-                          <th>
-                            Lương cơ bản
-                          </th>
-                          <th>
-                            Ngày tạo
-                          </th>
-                          <th>
-                            Thay đổi mới nhất
-                          </th>
-                          <th>
-                            Block
-                          </th>
-                          <th>
-                            Sửa
-                          </th>
+                          
                         </thead>
                         <tbody>
-                          <% var r=0;dataac[0].forEach(e =>{ r++;%>
-                          <tr>
-                            <td>
-                              <%= r %>
-                            </td>
-                            <td>
-                              <%= e.tennv %>
-                            </td>
-                            <td>
-                              <%= e.email %>
-                            </td>
-                            <td>
-                              <%= e.sdt %>
-                            </td>
-                            <td>
-                              <%= e.luongcoban %>
-                            </td>
-                            <td>
-                              <%= e.ngaytao%>
-                            </td>
-                            <td>
-                              <%= e.ngaycapnhat %>
-                            </td>
-                            <td>
-                              <% if(e.block){%>
-                              <a href="/block?id=<%=e._id%>"
-                                ><i class="fas fa-lock"></i
-                              ></a>
-                              <%}else{%>
-                              <a href="/block?id=<%=e._id%>"
-                                ><i class="fas fa-lock-open"></i
-                              ></a>
-                              <%}%>
-                            </td>
-                            <td>
-                              <a href="/fixaccout?id=<%=e._id%>"
-                                ><i class="fas fa-tools"></i
-                              ></a>
-                            </td>
-                          </tr>
-                          <%})%>
+                          <!--  -->
                         </tbody>
                       </table>
                     </div>
@@ -774,6 +749,13 @@ The above copyright notice and this permission notice shall be included in all c
           });
         });
       });
+    </script>
+    <script>
+         $(document).ready(()=>{
+              $('#themmagiamgia').click(()=>{
+                   $('#id01').css("display","block");
+              })
+         })
     </script>
   </body>
 </html>

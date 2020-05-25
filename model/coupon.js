@@ -7,6 +7,10 @@ const coupon = mongoose.Schema({
   },
   phantram: {
     type: Number,
+    required: true
+  },
+  trangthai: {
+    type: Number,
     required: true,
 }
 });

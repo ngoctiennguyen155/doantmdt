@@ -306,31 +306,40 @@
                                
                                 <h4>Your Order</h4>
                                 <div class="checkout__order__products">Products <span>Total</span></div>
-                                <% if(session.totalQty!=0){
+                                <%  
+                                if(session.totalQty!=0){
                                     var i = 0 ; 
-
-                                    var arr_qty =[];
-                                    list_qty.forEach(e=>{ 
-                                           arr_qty.push(e)
-                                        
-                                         });
-
                                     getcart.forEach(e=>{  %>
-
                                    <ul>
-                                    <li><%= e.item.tensp%> <span><%=e.item.gia*arr_qty[i]%></span></li>
+                                    <li><%= e.item.tensp%> <span><%=(e.item.gia-(e.item.gia*e.item.phantram/100))*arr_qty[i]%></span></li>
                                    </ul>
                                     
                                    
-                                   <%i++; })
-                                   %>
+                                   <%i++;
+                                   
+                                   
+                                 })
+                            %>
                                    <%}
                      %>
-                                <div class="checkout__order__subtotal">Subtotal <span>$750.99</span></br>
-                                                    <span style="color: red;font-size: 12px;"> - $750.99</span></div>
+                     
+                     <%
+                     if(session.totalQty!=0){
+                     var i = 0 ; 
+                     var subtotal = 0 ;
+                     
+                      getcart.forEach(e=>{ 
+                          subtotal+=(e.item.gia-(e.item.gia*e.item.phantram/100))*arr_qty[i];
+                          i++; 
+
+                      });%>
+                      
+                     <div class="checkout__order__subtotal">Subtotal <span><%=subtotal %></span></br>
+                                                    <span style="color: red;font-size: 12px;"> - <%=phantram %>%</span></div>
                                 
-                                <div class="checkout__order__total">Total <span>$750.99</span></div>
-                                
+                                <div class="checkout__order__total">Total <span><%=subtotal*(100-phantram)/100 %></span></div>
+                            
+                     <%}%>
                                 <!-- <div class="checkout__input__checkbox">
                                     <label for="acc-or">
                                         Create an account?

@@ -233,7 +233,7 @@
                     </td>
 
                     <td class="shoping__cart__price" >
-                      <div  class='price_updates_<%=e.item._id %>' name="price_<%=id%>"><%=e.totalprice%> </div>
+                      <div  class='price_updates_<%=e.item._id %>' name="price_<%=id%>"><%= e.item.gia-(e.item.gia*e.item.phantram/100) %> </div>
                     </td>
 
                     <td class="shoping__cart__quantity" >

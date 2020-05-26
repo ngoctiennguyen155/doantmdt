@@ -47,7 +47,7 @@ app.use(
 //
 app.set('views', './views');
 app.set('view engine', 'ejs');
-const port = 3000;
+const port = 4000;
 app.listen(port, console.log(`Listening on port ${port}...`));
 
 const schema = require('./model/schema');
@@ -85,6 +85,8 @@ const cartnull = { item: {}, totalQty: 0, totalPrice: Number(0) };
 const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
 const dsspnoibat = require('./model/sanpham');
+const coupon = require('./model/coupon');
+
 app.get('/', async (req, res) => {
   const data = await dssanpham.find({
     trangthai: 'con',
@@ -272,6 +274,29 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout', { session: req.session.cart || cartnull });
 });
+app.post('/checkout', async function (req, res) {
+  var phantram;
+  const mac = req.body.coupon;
+  const newcoupon = await coupon.find({ ma: mac });
+  // console.log(newcoupon);
+  if(!newcoupon[0]){phantram=0;}
+  else{phantram=newcoupon[0].phantram} 
+
+var cart = new Cart(req.session.cart || {});
+// console.log(newcoupon[0]);
+var arr_qty =[];
+req.body.y.forEach(e=>{ 
+  arr_qty.push(e)
+ });
+  res.render('checkout', {
+    arr_qty: arr_qty,
+    session: req.session.cart || cartnull,
+    getcart: cart.genetateArr() || [],
+    subtotal: cart.totalPrice || 0,
+    phantram: phantram,
+  });
+  
+});
 
 //route admin
 app.get('/admin', function (req, res) {
@@ -379,7 +404,6 @@ app.post('/validateemail', (req, res) => {
   });
 })
 //
-const coupon = require('./model/coupon');
 app.post('/add-coupon', async function (req, res) {
   const mac = req.body.coupon;
   const newcoupon = await coupon.find({ ma: mac });

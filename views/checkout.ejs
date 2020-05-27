@@ -43,7 +43,7 @@
                 <li><a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
         </li>
       </ul>
-      <div class="header__cart__price">item: <span><%=session.totalPrice%> VNĐ</span></div>
+      <div class="header__cart__price"></div>
         </div>
         <div class="humberger__menu__widget">
             <!-- <div class="header__top__right__language">
@@ -166,7 +166,7 @@
               <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
         </li>
       </ul>
-      <div class="header__cart__price">item: <span><%=session.totalPrice%> VNĐ</span></div>
+      <div class="header__cart__price"></div>
         </div>
       </div>
     </div>
@@ -212,6 +212,7 @@
             <div class="checkout__form">
                 <h4>Billing Details</h4>
                 <form action="#">
+
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
                             <div class="row">
@@ -302,17 +303,43 @@
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <div class="checkout__order">
+                               
                                 <h4>Your Order</h4>
                                 <div class="checkout__order__products">Products <span>Total</span></div>
-                                <ul>
-                                    <li>Vegetable’s Package <span>$75.99</span></li>
-                                    <li>Fresh Vegetable <span>$151.99</span></li>
-                                    <li>Organic Bananas <span>$53.99</span></li>
-                                </ul>
-                                <div class="checkout__order__subtotal">Subtotal <span>$750.99</span></br>
-                                                    <span style="color: red;font-size: 12px;"> - $750.99</span></div>
+                                <%  
+                                if(session.totalQty!=0){
+                                    var i = 0 ; 
+                                    getcart.forEach(e=>{  %>
+                                   <ul>
+                                    <li><%= e.item.tensp%> <span><%=(e.item.gia-(e.item.gia*e.item.phantram/100))*arr_qty[i]%></span></li>
+                                   </ul>
+                                    
+                                   
+                                   <%i++;
+                                   
+                                   
+                                 })
+                            %>
+                                   <%}
+                     %>
+                     
+                     <%
+                     if(session.totalQty!=0){
+                     var i = 0 ; 
+                     var subtotal = 0 ;
+                     
+                      getcart.forEach(e=>{ 
+                          subtotal+=(e.item.gia-(e.item.gia*e.item.phantram/100))*arr_qty[i];
+                          i++; 
+
+                      });%>
+                      
+                     <div class="checkout__order__subtotal">Subtotal <span><%=subtotal %></span></br>
+                                                    <span style="color: red;font-size: 12px;"> - <%=phantram %>%</span></div>
                                 
-                                <div class="checkout__order__total">Total <span>$750.99</span></div>
+                                <div class="checkout__order__total">Total <span><%=subtotal*(100-phantram)/100 %></span></div>
+                            
+                     <%}%>
                                 <!-- <div class="checkout__input__checkbox">
                                     <label for="acc-or">
                                         Create an account?
@@ -331,6 +358,7 @@
                                 </div>
                                 
                                 <button type="submit" class="site-btn">PLACE ORDER</button>
+                                
                             </div>
                         </div>
                     </div>

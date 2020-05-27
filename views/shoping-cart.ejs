@@ -46,7 +46,7 @@
             <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
         </li>
       </ul>
-      <div class="header__cart__price">item: <span><%=session.totalPrice%> </span></div>
+      <div class="header__cart__price"></div>
       </div>
       <div class="humberger__menu__widget">
         <!-- <div class="header__top__right__language">
@@ -170,7 +170,7 @@
                   <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
         </li>
       </ul>
-      <div class="header__cart__price">item: <span><%=session.totalPrice%> </span></div>
+      <div class="header__cart__price"></div>
             </div>
           </div>
         </div>
@@ -204,7 +204,10 @@
 
     <!-- Shoping Cart Section Begin -->
     <section class="shoping-cart spad">
+
       <div class="container">
+        <form action="/checkout" method="POST">
+
         <div class="row">
           <div class="col-lg-12">
             <div class="shoping__cart__table">
@@ -223,26 +226,26 @@
                     var id = 0;
                       getcart.forEach(e=>{ id++; %>
                       <!------------------------------------------------------- -->
-                    <tr class="shoping_tr">
-                    <td class="shoping__cart__item"  field='updates_<%=e.item.tensp %>'>
+                    <tr class="shoping_tr" name="<%=id%>">
+                    <td class="shoping__cart__item"  field='updates_<%=e.item.tensp %>' name="item_<%=id%>">
                       <img style="width: 100px;" src="images/<%=e.item.maloaisp%>/<%=e.item.fileanh%>" alt="" />
                       <h5><%=e.item.tensp%><%if(e.item.phantram){%><label>&#160;( -<%=e.item.phantram%>%)</label><%}%></h5> 
                     </td>
 
                     <td class="shoping__cart__price" >
-                      <div  class='price_updates_<%=e.item._id %>'><%=e.totalprice%> </div>
+                      <div  class='price_updates_<%=e.item._id %>' name="price_<%=id%>"><%= e.item.gia-(e.item.gia*e.item.phantram/100) %> </div>
                     </td>
 
                     <td class="shoping__cart__quantity" >
                       <div class="quantity">
                         <div class="pro-qty" id="bt_update" field='updates_<%=e.item._id %>' >
-                          <input type="text" value="<%=e.qty%>" class='qty_updates_<%=e.item._id %>' field='updates_<%=e.item._id %>' />
+                          <input type="text" name="y" value="<%=e.qty%>" class='qty_updates_<%=e.item._id %>' field='updates_<%=e.item._id %>' />
                         </div>
                       </div>
                     </td>
 
                     <td class="shoping__cart__total" >
-                      <div  class='total_updates_<%=e.item._id %>' id='<%= id%>'><%=e.totalprice%> </div>
+                      <div  class='total_updates_<%=e.item._id %>' id='<%= id%>' name="total_<%=id%>"><%=e.totalprice%> </div>
                     </td>
 
                     <td class="shoping__cart__item__close">
@@ -255,7 +258,7 @@
                       %>
                   <%}
                   %>
-                  
+
                 </tbody>
               </table>
             </div>
@@ -286,14 +289,17 @@
             <div class="shoping__checkout">
               <h5>Cart Total</h5>
               <ul>
-                <li>Subtotal <span class="all_sub"><%=subtotal%> </span></li>
+                <li>Subtotal <span class="all_sub" name="total"><%=subtotal%> </span></li>
                 <li > Discount(%) <span  class="discount"><%=phantram%> </></li>
                 <li>Total <span class="all_total"><%=subtotal - (subtotal*phantram/100)%> </span></li>
               </ul>
-              <a href="/checkout" class="primary-btn">PROCEED TO CHECKOUT</a>
+              <button type="submit" class="site-btn">Check out</button>
+              
             </div>
           </div>
         </div>
+      </form>
+
       </div>
     </section>
     <!-- Shoping Cart Section End -->
@@ -313,29 +319,33 @@
     <script src="js/main.js"></script>
   </body>
   <script>
-
+ 
 
 jQuery(document).ready(function(){
-    
+  
     var price_total= 0;
+    var qty_item=0;
+   
 //     function removeElement(elementId) {
 //     // Removes an element from the document
 //     var element = document.getElementById(elementId);
 //     element.parentNode.removeChild(element);
 // }
 $('.icon_close').click(function(e){
+  
   e.preventDefault();
   cartItem = $(this).parent().parent();
   cartItem.remove();
-  alert("xu ly session load lai trang ");
-  location.reload();
-// xu ly session
+  _total();
+  
   
   
     });
 
     $('.pro-qty').click(function(e){
         e.preventDefault();
+    
+  
         // Get the field name
         fieldName = $(this).attr('field');
         var qty = parseInt($('.qty_'+fieldName).val());
@@ -354,13 +364,14 @@ $('.icon_close').click(function(e){
         _total();
     });
 
-var qty_item=0;
-    $('.shoping_tr').each(function (){
+
+
+function _total(){
+  $('.shoping_tr').each(function (){
     qty_item++;
 });
 
-function _total(){
-  price_total = 0;
+    price_total = 0;
     for (let i = 1; i<=qty_item; i++) {
     price_total+=parseFloat($('#'+i).text());
     }
@@ -368,6 +379,7 @@ function _total(){
     discount=parseInt($('.discount').text());
     total_after_discount=price_total * ((100-discount)/100);
     $('.all_total').text( total_after_discount);
+    qty_item=0;
 
 }
     

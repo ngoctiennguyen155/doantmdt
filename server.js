@@ -47,7 +47,7 @@ app.use(
 //
 app.set('views', './views');
 app.set('view engine', 'ejs');
-const port = 4000;
+const port = 3000;
 app.listen(port, console.log(`Listening on port ${port}...`));
 
 const schema = require('./model/schema');

@@ -80,50 +80,50 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Profile</p>
             </a>
           </li> -->
-            <li class="nav-item ">
-            <a class="nav-link" href="/thongke">
-              <i class="material-icons"><i class="fas fa-chart-line"></i></i>
-              <p>Thống kê</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/qlsanpham">
-              <i class="material-icons">content_paste</i>
-              <p>Sản phẩm</p>
-            </a>
-          </li>
-         <li class="nav-item active">
-            <a class="nav-link" href="/hoadon">
-              <i class="material-icons">library_books</i>
-              <p>Hóa đơn</p>
-            </a>
-         </li>
-          
-          <li class="nav-item ">
-            <a class="nav-link" href="/mail">
-              <i class="material-icons">mail_ons</i>
-              <p>Mail</p>
-            </a>
-          </li>
-          <li class="nav-item ">
-            <a class="nav-link" href="/mailcontact">
-              <i class="material-icons">notifications</i>
-              <p>Contact message</p>
-            </a>
-          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/thongke">
+                <i class="material-icons"><i class="fas fa-chart-line"></i></i>
+                <p>Thống kê</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/qlsanpham">
+                <i class="material-icons">content_paste</i>
+                <p>Sản phẩm</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/hoadon">
+                <i class="material-icons">library_books</i>
+                <p>Hóa đơn</p>
+              </a>
+            </li>
 
-          <li class="nav-item ">
-            <a class="nav-link" href="./coupon">
-              <i class="material-icons">bubble_chart</i>
-              <p>Mã giảm giá</p>
-            </a>
-          </li>
-          <li class="nav-item" >
-            <a class="nav-link" href="/nhaphang">
-              <i class="material-icons"><i class="fas fa-ambulance"></i></i>
-              <p>Nhập hàng</p>
-            </a>
-          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mail">
+                <i class="material-icons">mail_ons</i>
+                <p>Mail</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mailcontact">
+                <i class="material-icons">notifications</i>
+                <p>Contact message</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="./coupon">
+                <i class="material-icons">bubble_chart</i>
+                <p>Mã giảm giá</p>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="/nhaphang">
+                <i class="material-icons"><i class="fas fa-ambulance"></i></i>
+                <p>Nhập hàng</p>
+              </a>
+            </li>
 
             <!-- <li class="nav-item active-pro ">
             <a class="nav-link" href="./upgrade.html">
@@ -141,7 +141,7 @@ The above copyright notice and this permission notice shall be included in all c
         >
           <div class="container-fluid">
             <div class="navbar-wrapper">
-              <a class="navbar-brand" href="javascript:;">Hóa đơn</a>
+              <a class="navbar-brand" href="javascript:;">Nhập hàng</a>
             </div>
             <button
               class="navbar-toggler"
@@ -233,39 +233,102 @@ The above copyright notice and this permission notice shall be included in all c
               <div class="col-md-12">
                 <div class="card">
                   <div class="card-header card-header-primary">
-                    <h4 class="card-title">Bảng hóa đơn</h4>
-                    <p class="card-category">Quản lí các thông tin hóa đơn</p>
+                    <h4 class="card-title">Lập phiếu nhập hàng</h4>
+                    <p class="card-category">
+                      Sau khi tạo, phiếu nhập hàng sẽ được xử lý
+                    </p>
                   </div>
                   <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table">
-                        <thead class="text-primary">
-                          <th>
-                            ID
-                          </th>
-                          <th>
-                            Email
-                          </th>
-                          <th>
-                            Ngày sub
-                          </th>
-                          
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>
-                              1
-                            </td>
-                            <td>
-                              Dakota Rice
-                            </td>
-                            <td>
-                              Niger
-                            </td>
-                            
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-sm-5" style="text-align: center;">
+                         <input
+                                id="tim"
+                                  type="text"
+                                  value=""
+                                  class="form-control"
+                                  placeholder="Search..."
+                                />
+                          <table id="dssp" class="table">
+                            <thead class="text-primary">
+                              <th>
+                                Tên sản phẩm
+                              </th>
+                              
+                            </thead>
+                            <tbody>
+                              <%data.forEach(e=>{%>
+                              <tr>
+                                <td>
+                                  <p id="tensp"><%=e.tensp%></p>
+                                </td>
+                                <td>
+                                  <a href="javascript:;" id="add">
+                                    <i
+                                      style="font-size: 20px;"
+                                      class="fas fa-arrow-circle-right"
+                                    ></i
+                                  ></a>
+                                </td>
+                              </tr>
+                              <%})%>
+                              <!-- <tr>
+                                <td>
+                                  name
+                                </td>
+                                <td>
+                                  <a href="javascript:;">
+                                    <i
+                                      style="font-size: 20px;"
+                                      class="fas fa-arrow-circle-right"
+                                    ></i
+                                  ></a>
+                                </td>
+                              </tr> -->
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="col-sm-2"></div>
+                        <a class="col-sm-5" style="text-align: center;">
+                          <table id="order" class="table" style="margin-top: 12px;">
+                            <thead class="text-primary">
+                              <th>
+                                Danh sách sản phẩm cần đặt
+                              </th>
+                              <th></th>
+                            </thead>
+                            <tbody>
+                           
+                              
+                             
+                              <!-- <tr>
+                                <td>
+                                  name
+                                </td>
+                                <td>
+                                  <a href="javascript:;">
+                                    <i
+                                      style="font-size: 20px;"
+                                      class="fas fa-arrow-circle-right"
+                                    ></i
+                                  ></a>
+                                </td>
+                              </tr> -->
+                            </tbody>
+                          </table>
+                          <button id="send" 
+                            style="
+                              padding: 5px 30px 5px 30px;
+                              border: none;
+                              border-radius: 5px;
+                              background-color: purple;
+                              color: white;
+                            "
+                          >
+                            Gửi
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -733,6 +796,38 @@ The above copyright notice and this permission notice shall be included in all c
           });
         });
       });
+    </script>
+    <script>
+         $(document).ready(()=>{
+               $('#dssp').on('click','#add',function(){
+                    var rowEl =  $(this).closest('tr');
+                    var name = rowEl.find('#tensp').text();
+                    //alert(name);
+                    
+     $('#order > tbody:last-child').append('<tr><td><p id="tenor">'+name+'</p></td><td><input id="sl" type="number" min="1"'+' value="1"style="width:100px"> '+
+                         '</td><td><a href="javascript:;" id="delete"><i style="font-size: 20px;" class="fas fa-times-circle"></i></a></td></tr>');
+               });
+               $('#order').on('click','#delete',function(){
+                    $(this).closest('tr').remove();
+               });
+               $("#tim").on("keyup", function() {
+                    var value = $(this).val().toLowerCase();
+                    $("#dssp tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+               });
+               var arr=[];
+               $('#send').click(()=>{
+                    $('#order tr').each(function (a, b) {
+                         var name = $('#tenor', b).text();
+                         var sl = $('#sl', b).val();
+                         arr.push({name:name,sl:sl});
+                    });
+                    arr.forEach(e=>{
+                         console.log(e.name , e.sl);
+                    })
+               })
+         })
     </script>
   </body>
 </html>

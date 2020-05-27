@@ -280,8 +280,11 @@ app.get('/admin', function (req, res) {
 app.get('/hoadon', function (req, res) {
   res.render('hoadon');
 })
-app.get('/coupon', function(req,res){
-  res.render('coupon');
+app.get('/coupon',async function (req, res) {
+  const coupon = require('./model/coupon');
+  const datacoupon = await coupon.find({}).sort({ trangthai: 1,phantram:1 });
+  console.log(datacoupon);
+  res.render('coupon', { data: datacoupon });
 })
 app.get('/qlsanpham',async function (req, res) {
   const spl = await allsp.find({}).sort({ sl: 1 });
@@ -301,9 +304,9 @@ app.post('/admin',async function (req, res) {
   let dataac = [];
   dataac[0] = dataacc;
   let user = await ac.find({ email: e });
- 
-  console.log(user[0].matkhau);
-  const validatehashpw = await bcrypt.compare(pw, user[0].matkhau);
+  if (user.length != 0) {
+   var validatehashpw = await bcrypt.compare(pw, user[0].matkhau); 
+  }
   if (validatehashpw) {
     if (user[0].chucvu == "admin") {
       zdadsfasdfa[1] = user[0].email;
@@ -418,8 +421,14 @@ app.get('/magiamgia', async (req, res) => {
   res.render('magiamgia', { data: datacoupon });
 });
 
-
-
+app.get('/nhaphang',async (req, res) => {
+  let gettableproduct =await allsp.find({});
+  //console.log(gettableproduct);
+  res.render('nhaphang',{data:gettableproduct});
+})
+app.get('/xacnhannhaphang',(req, res) => {
+  res.render('xacnhannhaphang');
+})
 
 
 // ajax route 
@@ -549,6 +558,7 @@ app.put('/createaccout', async (req, res) => {
   let email = req.body.email;
   let sdt = req.body.sdt;
   let chucvu = req.body.chucvu;
+  let pw = req.body.password;
  
   const salt =await bcrypt.genSalt(10);
   const pwhash = await await bcrypt.hash(req.body.password, salt);
@@ -577,20 +587,26 @@ app.put('/createaccout', async (req, res) => {
     } else res.send('Email exist !!!');
   } else {
     let id = req.body.id;
+    let objac = {
+      tennv: tennv,
+      email: email,
+      sdt: sdt,
+      gioitinh: '',
+      diachi: '',
+      chucvu: chucvu,
+      taikhoan: email,
+      ngaycapnhat: Date.now(),
+    };
+    if (pw) {
+      objac.matkhau = await bcrypt.hash(req.body.password, salt);
+    }
+    if (pw.length == 0) {
+      console.log('adf');
+    }
     await ac.findByIdAndUpdate(
       { _id: new ObjectId(id) },
       {
-        $set: {
-          tennv: tennv,
-          email: email,
-          sdt: sdt,
-          gioitinh: '',
-          diachi: '',
-          chucvu: chucvu,
-          taikhoan: email,
-          matkhau: await bcrypt.hash(req.body.password, salt),
-          ngaycapnhat: Date.now()
-        },
+        $set: objac,
       }, { new: true }, (err, doc) => {
         if (err) console.log(err);
          res.send('Update accout success !!!');

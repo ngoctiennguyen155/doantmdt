@@ -59,7 +59,7 @@ The above copyright notice and this permission notice shall be included in all c
           </li> -->
           <li class="nav-item ">
             <a class="nav-link" href="/thongke">
-              <i class="material-icons">dashboard</i>
+              <i class="material-icons"><i class="fas fa-chart-line"></i></i>
               <p>Thống kê</p>
             </a>
           </li>
@@ -93,6 +93,12 @@ The above copyright notice and this permission notice shall be included in all c
             <a class="nav-link" href="./coupon">
               <i class="material-icons">bubble_chart</i>
               <p>Mã giảm giá</p>
+            </a>
+          </li>
+          <li class="nav-item" >
+            <a class="nav-link" href="/nhaphang">
+              <i class="material-icons"><i class="fas fa-ambulance"></i></i>
+              <p>Nhập hàng</p>
             </a>
           </li>
           <!-- <li class="nav-item active-pro ">
@@ -304,35 +310,35 @@ The above copyright notice and this permission notice shall be included in all c
                           <td>
                             <input id="getid" type="hidden" value="<%=e._id%>">
                             <input id="inputphantram" style="width: 50px;" type="number" name="quantity" min="0" max="100" value="<%=e.phantram%>">
-                            <a id="updatephantram"><i style="font-size: 20px;color: skyblue;" class="fas fa-level-up-alt"></i></a>
+                            <a href="javascript:;" id="updatephantram"><i style="font-size: 20px;color: skyblue;" class="fas fa-level-up-alt"></i></a>
                             
                           </td>
                           <td>
                             <%if(e.trangthai=="het" ){%>
-                             <a id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Hết</a>
+                             <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Hết</a>
                             <%}else { if(Number(e.sl)<=10){%>
-                              <a id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Còn</a>
+                              <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Còn</a>
                               <%}else {%>
-                                <a id="trangthai">Còn</a>
+                                <a href="javascript:;" id="trangthai">Còn</a>
                               <%}}%>
                           </td>
                           <td>
                             <%if(e.hieuluc=="het"){%>
-                           <a id="hieuluc">Hết</a>
+                           <a href="javascript:;" id="hieuluc">Hết</a>
                             <%}else {%>
-                              <a id="hieuluc">Còn</a>
+                              <a href="javascript:;" id="hieuluc">Còn</a>
                               <%}%>
                           </td>
                           <td>
                             <%if(!e.noibat){%>
-                             <a ><i id="noibat" style="font-size: 1.7em;color: red;" class="far fa-times-circle"></i></a>
+                             <a href="javascript:;" ><i id="noibat" style="font-size: 1.7em;color: red;" class="far fa-times-circle"></i></a>
                             <%}else {%>
-                             <a ><i id="noibat" style="font-size: 1.7em;color: red;" class="far fa-check-circle"></i></a>
+                             <a href="javascript:;" ><i id="noibat" style="font-size: 1.7em;color: red;" class="far fa-check-circle"></i></a>
                               <%}%>
                            
                           </td>
                           <td>
-                            <a style="font-size:20px" href="#"><i class="fas fa-tools"></i></a>
+                            <a href="javascript:;" style="font-size:20px" href="#"><i class="fas fa-tools"></i></a>
                           </td>
                         </tr> 
                         <%})%>

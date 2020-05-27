@@ -64,6 +64,13 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Mã giảm giá</p>
             </a>
           </li>
+          <li class="nav-item" >
+            <a class="nav-link" href="/xacnhannhaphang">
+              <i class="material-icons">checkcircle</i>
+              <p>Xác nhận nhập hàng</p>
+            </a>
+          </li>
+          
           <!--
          <li class="nav-item active" >
             <a class="nav-link" href="/hoadon">
@@ -298,13 +305,13 @@ The above copyright notice and this permission notice shall be included in all c
                           </td>
                           <td>
                             <% if(e.block){%>
-                            <a style="color: skyblue;font-size: large;"><i id="status" class="fas fa-lock"></i></a>
+                            <a style="color: skyblue;font-size: large;" href="javascript:;"><i id="status" class="fas fa-lock"></i></a>
                             <%}else{%>
-                            <a><i id="status" style="color: skyblue;font-size: large;" class="fas fa-lock-open"></i></a>
+                            <a href="javascript:;"><i id="status" style="color: skyblue;font-size: large;" class="fas fa-lock-open"></i></a>
                             <%}%>
                             </td>
                             <td>
-                              <a 
+                              <a href="javascript:;"
                                 ><i id="chinhsua" style="font-size: 20px;color: skyblue;" class="fas fa-tools"></i
                               ></a>
                             </td>
@@ -815,6 +822,8 @@ The above copyright notice and this permission notice shall be included in all c
         $('#tennv').val("");
         $('#email').val("");
         $('#sdt').val("");
+        $('#password').val("");
+        $('#repassword').val("");
 
       })
 
@@ -843,12 +852,7 @@ The above copyright notice and this permission notice shall be included in all c
 
       });
       
-      $('.close').click(()=>{
-        window.location.href='http://localhost:3000/taikhoan';
-      });
-      $('#btnmail').click(()=>{
-        window.location.href='http://localhost:3000/taikhoan';
-      })
+      
 
       $('#btngiamgia').click(() => {
         var id = $('#id_').val();
@@ -864,13 +868,14 @@ The above copyright notice and this permission notice shall be included in all c
         if (loai == "Tạo") {
           loai = 'tao';
         } else loai = 'sua';
+
         if (tt == "") {
           $('#tennv').focus();
         } else if (ee == "") {
           $('#email').focus();
-        } else if(pw.length==0){
+        } else if(pw.length==0 && loai=='tao'){
           $('#password').focus();
-        } else if(repw.length==0){
+        } else if(repw.length==0 && loai=='tao'){
           $('#repassword').focus();
         }else if(repw!=pw){
           $('#repassword').focus();
@@ -886,6 +891,10 @@ The above copyright notice and this permission notice shall be included in all c
               $('#error').text(res);
               setTimeout(()=>{
                 $('#error').text("");
+                if(loai=='tao'){
+                  window.location.href='http://localhost:3000/taikhoan';
+                  $('.close').click();
+                }else $('.close').click();
               },2000);
             }
           })

@@ -37,9 +37,12 @@ The above copyright notice and this permission notice shall be included in all c
       type="text/css"
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"
     />
-    
-1
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+    1
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    />
 
     <link
       rel="stylesheet"
@@ -52,10 +55,14 @@ The above copyright notice and this permission notice shall be included in all c
     />
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="../assets/demo/demo.css" rel="stylesheet" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
 
   <body class="">
     <div class="wrapper">
+      <%-include('mailpopup')%>
       <div
         class="sidebar"
         data-color="purple"
@@ -84,50 +91,50 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Profile</p>
             </a>
           </li> -->
-            <li class="nav-item ">
-            <a class="nav-link" href="/thongke">
-              <i class="material-icons"><i class="fas fa-chart-line"></i></i>
-              <p>Thống kê</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/qlsanpham">
-              <i class="material-icons">content_paste</i>
-              <p>Sản phẩm</p>
-            </a>
-          </li>
-         <li class="nav-item ">
-            <a class="nav-link" href="/hoadon">
-              <i class="material-icons">library_books</i>
-              <p>Hóa đơn</p>
-            </a>
-         </li>
-          
-          <li class="nav-item active">
-            <a class="nav-link" href="/mail">
-              <i class="material-icons">mail_ons</i>
-              <p>Mail</p>
-            </a>
-          </li>
-          <li class="nav-item ">
-            <a class="nav-link" href="/mailcontact">
-              <i class="material-icons">notifications</i>
-              <p>Contact message</p>
-            </a>
-          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/thongke">
+                <i class="material-icons"><i class="fas fa-chart-line"></i></i>
+                <p>Thống kê</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/qlsanpham">
+                <i class="material-icons">content_paste</i>
+                <p>Sản phẩm</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/hoadon">
+                <i class="material-icons">library_books</i>
+                <p>Hóa đơn</p>
+              </a>
+            </li>
 
-          <li class="nav-item ">
-            <a class="nav-link" href="./coupon">
-              <i class="material-icons">bubble_chart</i>
-              <p>Mã giảm giá</p>
-            </a>
-          </li>
-          <li class="nav-item" >
-            <a class="nav-link" href="/nhaphang">
-              <i class="material-icons"><i class="fas fa-ambulance"></i></i>
-              <p>Nhập hàng</p>
-            </a>
-          </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="/mail">
+                <i class="material-icons">mail_ons</i>
+                <p>Mail</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mailcontact">
+                <i class="material-icons">notifications</i>
+                <p>Contact message</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="./coupon">
+                <i class="material-icons">bubble_chart</i>
+                <p>Mã giảm giá</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/nhaphang">
+                <i class="material-icons"><i class="fas fa-ambulance"></i></i>
+                <p>Nhập hàng</p>
+              </a>
+            </li>
 
             <!-- <li class="nav-item active-pro ">
             <a class="nav-link" href="./upgrade.html">
@@ -259,7 +266,7 @@ The above copyright notice and this permission notice shall be included in all c
                         </thead>
                         <tbody>
                           <% var stt=0; mail.forEach(e =>{stt++; %>
-                            <tr>
+                          <tr>
                             <td>
                               <%=stt%>
                             </td>
@@ -270,11 +277,15 @@ The above copyright notice and this permission notice shall be included in all c
                               <%=e.date%>
                             </td>
                             <td>
-                             <i class="fa fa-paper-plane" aria-hidden="true" style="color: skyblue; font-size: 20px;"></i>
+                              <i
+                                data-toggle="modal"
+                                data-target="#myModal"
+                                class="fa fa-paper-plane"
+                                aria-hidden="true"
+                                style="color: skyblue; font-size: 20px;"
+                              ></i>
                             </td>
-                          <%})%>
-                          
-                            
+                            <%})%>
                           </tr>
                         </tbody>
                       </table>

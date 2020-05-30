@@ -273,7 +273,7 @@ The above copyright notice and this permission notice shall be included in all c
                               <%=e.name%>
                             </td>
                             <td>
-                              <%=e.email%>
+                             <p id="getemail"> <%=e.email%></p>
                             </td>
                             <td>
                               <%=e.message%>
@@ -282,13 +282,14 @@ The above copyright notice and this permission notice shall be included in all c
                               <%=e.date%>
                             </td>
                             <td class="text-primary">
-                              <i
+                              <a href="javascript:;" id="sendmailsub"><i
+                              
                                 data-toggle="modal"
                                 data-target="#myModal"
                                 class="fa fa-paper-plane"
                                 aria-hidden="true"
                                 style="color: skyblue; font-size: 20px;"
-                              ></i>
+                              ></i></a>
                             </td>
                           </tr>
                           <%})%>
@@ -759,6 +760,60 @@ The above copyright notice and this permission notice shall be included in all c
               clearInterval(simulateWindowResize);
             }, 1000);
           });
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function () {
+        $('table').on('click', '#sendmailsub', function () {
+          var rowEl = $(this).closest('tr');
+          var mail = rowEl.find('#getemail').text();
+          $('#nguoinhan').val(mail);
+          $('#nguoinhan').css('disabled', 'true');
+          var tieude = $('#tieude');
+          var noidung = $('#noidung');
+          var coupon = $('#magiamgia');
+          $('#send').click(() => {
+            console.log(tieude.val(), noidung.val(), coupon.val());
+            $.ajax({
+              url: '/sendemailtouser',
+              method: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify({
+                email: mail,
+                tieude: tieude.val(),
+                noidung: noidung.val(),
+                coupon: coupon.val(),
+              }),
+              success: (res) => {
+                $('#error').text(res);
+                setTimeout(() => {
+                  $('#error').text('');
+                }, 1000);
+              },
+            });
+          });
+          $('#close').click(() => {
+            tieude.val('');
+            noidung.val('');
+            coupon.val('');
+          });
+          //console.log(tam);
+          //console.log(id);
+          //console.log(val);
+          // $.ajax({
+          //   url : '/updatephantram',
+          //   method:'PUT',
+          //   contentType:"application/json",
+          //   data : JSON.stringify({phantram : val,id:id}),
+          //   success : (res)=>{
+          //     alert(res.message);
+          //     if(res.status==0){
+          //      //alert(res.old);
+          //       rowEl.find('#inputphantram').val(res.old);
+          //     }
+          //   }
+          // })
         });
       });
     </script>

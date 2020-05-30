@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
 const multer = require('multer');
+const nodemailer = require('nodemailer');
 require('dotenv/config');
 
 var router = require('express').Router();
@@ -688,4 +689,39 @@ app.post('/addproduct', (req, res) => {
 
   
   res.redirect('/qlsanpham');
+})
+
+app.post('/sendemailtouser', async (req, res) => {
+  let htmlt = '<p>Nội dung: ' + req.body.noidung|| "" + '</p>';
+  if (req.body.coupon) {
+    //console.log(req.body);
+    let newcoupon =await coupon.find({ ma: req.body.coupon,trangthai: 0 });
+    if (newcoupon.length == 0) {
+      res.send('Mã giảm giá không tồn tại hoặc đã được sử dụng !!!!'); return;
+    } else {
+      htmlt += '<p>Tặng mã giảm giá: ' + req.body.coupon + '</p>';
+      await coupon.findOneAndUpdate({ ma: req.body.coupon, trangthai: 0 },{trangthai : 1}, { new : true });
+    }
+  }
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env._EMAIL,
+      pass: process.env._PASSWORD,
+    },
+  });
+  var mailOptions = {
+    from: 'OGANI <' + process.env._EMAIL + '>',
+    to: req.body.email,
+    subject: req.body.tieude,
+    html: htmlt,
+  };
+  transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+  });
+  res.send('Email đã gửi !!!');
 })

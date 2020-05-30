@@ -24,14 +24,30 @@
            <!-- code dô đây nè -->
             <div class="modal-body">
                
-               <p>Some text in the modal.</p>
-               <label for="">To: </label><input type="text" id="mailsub"></br>
-               <label for="">Subject: </label><input type="text" id="mailsubject"></br>
-          
-               <label for="my-textarea">Text</label>
-               <textarea id="my-textarea" name=""></textarea>
+               
+               <!-- <label for="">To: </label><input type="text" id="mailsub"></br> -->
+               <div class="form-group">
+                <label class="bmd-label-floating">To</label>
+                <input type="text" class="form-control" id="mailsub">
+              </div>
+               <!-- <label for="">Subject: </label><input type="text" id="mailsubject"></br> -->
+               <div class="form-group">
+                <label class="bmd-label-floating">Subject</label>
+                <input type="text" class="form-control" id="mailsubject">
+              </div>
+
+               <!-- <label for="my-textarea">Text</label>
+               <textarea id="my-textarea" name=""></textarea> -->
+               <div class="form-group">
+                <label>Content</label>
+                <div class="form-group">
+                  <label class="bmd-label-floating"> Some things...</label>
+                  <textarea class="form-control" rows="5" id="my-textarea"></textarea>
+                </div>
+              </div>
             </div>
             <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Send</button>
               <button
                 type="button"
                 class="btn btn-default"

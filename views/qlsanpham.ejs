@@ -203,25 +203,31 @@ The above copyright notice and this permission notice shall be included in all c
                         </div>
                         <div class="modal-body text-primary">
                           <p id="error"></p>
-                          <form style="text-align: center;" id="formcreate">
+                          <form style="text-align: center;" id="formcreate" enctype="multipart/form-data" action="/addproduct" method="POST">
                             <div style="text-align: left;margin: 10px;">
-                              <label for="" class="w30 mt5">Tên sản phẩm: </label>
-                              <input id="tensp" class="w60 mt5 ml5" type="text" placeholder="Tên sản phẩm" ></br>
-                              <label for="" class="w30 mt5"> Ảnh: </label>
-                              <input id="anh" class="mt5 ml5 w60 "  type="file" id="img" name="img" accept="image/*">
-                              <label for="" class="w30 mt5">Giá: </label>
-                              <input class="w60 mt5 ml5" id="gia" type="password" placeholder="Giá"></br>
+                              <label for="tensp" class="w30 mt5">Tên sản phẩm: </label>
+                              <input id="tensp" class="w60 mt5 ml5" type="text" placeholder="Tên sản phẩm" name="tensp"></br>
+                             
+                              <label for="gia" class="w30 mt5">Giá: </label>
+                              <input class="w60 mt5 ml5" id="gia" type="text" placeholder="Giá" name="gia"></br>
                               
-                              <label class="mt5 w30" for="" >Mã loại sp: </label>
-                              <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" >
-                                <option value="0">Chọn mã sp</option>
-                                <option value="1">dog</option>
-                                <option value="2">cat</option>
-                                <option value="3">pig</option>
+                              <label class="mt5 w30" for="maloaisp" >Mã loại sp: </label>
+                              <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" name="maloaisp" >
+                                <option value="">Chọn mã sp</option>
+                                <option value="thit">Thịt</option>
+                                <option value="raucu">Rau củ</option>
+                                <option value="traicay">Trái cây</option>
+                                <option value="haisan">Hải sản</option>
+                                <option value="doanlien">Thức ăn nhanh</option>
+                                <option value="nuoc">Nước</option>
+                                <option value="sua">Sữa</option>
+                                <option value="banhkeo">Bánh kẹo</option>
                               </select>
+                               <label for="anh" class="w30 mt5"> Ảnh: </label>
+                              <input id="anh" class="mt5 ml5 w60 "  type="file"  name="anh" accept="image/*" >
                             </div>
                             <input type="hidden" value="" id="id_">
-                            <input id="btngiamgia" type="button"
+                            <input id="btnsendfix" type="submit"
                               class="btn btn-primary w50"
                               value="Tạo"></input>
                           </form>
@@ -339,7 +345,7 @@ The above copyright notice and this permission notice shall be included in all c
                            
                           </td>
                           <td>
-                            <a href="javascript:;" style="font-size:20px" href="#"><i class="fas fa-tools"></i></a>
+                            <a id="fixproduct" href="javascript:;" style="font-size:20px" href="#"><i class="fas fa-tools"></i></a>
                           </td>
                         </tr> 
                         <%})%>
@@ -418,7 +424,7 @@ The above copyright notice and this permission notice shall be included in all c
                           <td>
                             Sage Rodriguez
                           </td>
-                          <td>
+                          <td>x
                             Netherlands
                           </td>
                           <td>
@@ -810,16 +816,12 @@ The above copyright notice and this permission notice shall be included in all c
            }
         })
       })
-
+      
       $('#themsanpham').click(() => {
         $('#id01').css("display", "block");
-        $('#btngiamgia').val('Tạo');
-        $('#tennv').val("");
-        $('#email').val("");
-        $('#sdt').val("");
-
       })
-
+         
+      
       //search
       $('#inputsearch').on('keyup',function(){
         var value = $(this).val().toLowerCase();
@@ -890,10 +892,9 @@ The above copyright notice and this permission notice shall be included in all c
            }
         })
         }
-      })
-    });
+      });
 
-    //hieuluc
+      //hieuluc
      $('table').on('click','#hieuluc',function(){
         var rowEl =  $(this).closest('tr');
         var id = rowEl.find('#getid').val();
@@ -923,7 +924,72 @@ The above copyright notice and this permission notice shall be included in all c
         }
      })
 
+    // $("#btnsendfix").click(()=>{
+    
+    //   let tensp = $('#tensp').val();
+    //   let anh = $('#anh').val();
+    //   let gia = $('#gia').val();
+    //   let loai = $('#maloaisp').val();
+    //   console.log(tensp);
+    //   console.log(anh);
+    //   console.log(gia);
+    //   console.log(loai);
+    // })
+      $('#formcreate').on('submit',(e)=>{
+        
+        let tensp = $('#tensp').val();
+        let anh = $('#anh').val();
+        let gia = $('#gia').val();
+        let loai = $('#maloaisp').val();
+        if(tensp.length==0){
+          e.preventDefault();
+          $('#tensp').focus();
+          $('#error').text("Vui lòng đặt tên cho sản phẩm .....");
+          return false;
+        }else if(gia.length==0){
+          e.preventDefault();
+          $('#gia').focus();
+          $('#error').text("Vui lòng nhập giá sản phẩm.....");
+           return false;
+        }else if(loai==0){
+           e.preventDefault();
+          $('#maloaisp').focus();
+          $('#error').text("Vui lòng chọn mã loại sản phẩm .....");
+           return false;
+        }else if(anh.length==0){
+          e.preventDefault();
+          $('#anh').focus();
+          $('#error').text("vui lòng thêm ảnh cho sản phẩm .....");
+           return false;
+        }
+        let duoi = anh.split('.');
+        let duoifinal = duoi[duoi.length-1];
+        if(duoifinal!="png" && duoifinal!="jpg" && duoifinal!="jpeg"){
+          $('#error').text("Chỉ hổ trợ png,jpeg,jpg .....");
+          return false;
+        }
+      
+        $('#error').text("Thêm sản phẩm thành công !!!");
+        $.ajax({
+          url: '/addproduct', //I just want to know what webpage posted data
+          method: 'POST',
+          type: 'POST',
+          data: JSON.stringify({tensp:tensp, anh : anh, gia:gia,maloaisp : loai}),
+          processData: false,
+          dataType: 'json', 
+          contentType: 'application/json; charset=utf-8',
+          success : (res)=>{
+            $('#error').text(res);
+          }
+        });
+      })
+
+
+     // document . ready
+    });
+
+    
+
   </script>
 </body>
-
 </html>

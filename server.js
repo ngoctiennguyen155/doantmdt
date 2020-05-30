@@ -8,6 +8,7 @@ const csrf = require('csurf');
 const bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
+const multer = require('multer');
 require('dotenv/config');
 
 var router = require('express').Router();
@@ -27,6 +28,7 @@ mongodb
 var path = require('path');
 
 /// middleware
+app.use(express.json());
 app.use(express.static('./public'));
 //app.use(express.static(path.join(__dirname, 'public')));
 var Cart = require('./model/cart');
@@ -636,6 +638,54 @@ app.put('/createaccout', async (req, res) => {
          res.send('Update accout success !!!');
       }
     );
-   
   }
 });
+
+
+app.post('/addproduct', (req, res) => {
+  var getnamepicture;
+  var tensp, gia, loai;
+   const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+       if (
+         file.mimetype !== 'image/png' &&
+         file.mimetype !== 'image/jpg' &&
+         file.mimetype !== 'image/jpeg'
+       ) {
+         res.send('Error : Chỉ được upload file png,jpg,jpeg');
+         return false;
+       }
+      cb(null, './public/images/'+req.body.maloaisp);
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+  var upload = multer({ storage: storage }).single('anh');
+  upload(req, res, function (err) {
+    if (err) {
+      console.log('Error : Somgthing went wrong !!!');
+    }
+    console.log('Thêm sản phẩm thành công !!!');
+    console.log(req.body, req.file);
+    let objproduct = {
+      tensp: req.body.tensp,
+      fileanh: req.file.filename,
+      chitiet: "abc",
+      gia: req.body.gia,
+      maloaisp: req.body.maloaisp,
+      sl: "0",
+      hsd: "1 tháng",
+      phantram: 0,
+      trangthai: 'het',
+      hieuluc: 'het',
+      noibat: false
+    };
+    let newproduct = new allsp(objproduct);
+    newproduct.save();
+    console.log(objproduct);
+  });
+
+  
+  res.redirect('/qlsanpham');
+})

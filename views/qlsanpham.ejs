@@ -210,7 +210,7 @@ The above copyright notice and this permission notice shall be included in all c
                              
                               <label for="gia" class="w30 mt5">Giá: </label>
                               <input class="w60 mt5 ml5" id="gia" type="text" placeholder="Giá" name="gia"></br>
-                              
+                              <input type="hidden" value="" id="_type">
                               <label class="mt5 w30" for="maloaisp" >Mã loại sp: </label>
                               <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" name="maloaisp" >
                                 <option value="">Chọn mã sp</option>
@@ -295,7 +295,7 @@ The above copyright notice and this permission notice shall be included in all c
                             <%=r%>
                           </td>
                           <td>
-                            <%=e.tensp%>
+                            <p id="nameproduct"><%=e.tensp%></p>
                           </td>
                           <td>
                             <img style="width: 100px;height: 100px;" src="/images/<%=e.maloaisp%>/<%=e.fileanh%>">
@@ -304,10 +304,10 @@ The above copyright notice and this permission notice shall be included in all c
                             <%=e.chitiet%>
                           </td> -->
                           <td class="text-primary">
-                            <%=e.gia%> VNĐ
+                            <label id="priceproduct"><%=e.gia%></label> VNĐ
                           </td>
                           <td>
-                            <%=e.maloaisp%>
+                            <p id="maproduct"><%=e.maloaisp%></p>
                           </td>
                           <td>
                             <label id="sl"><%=e.sl%></label>
@@ -820,6 +820,7 @@ The above copyright notice and this permission notice shall be included in all c
       
       $('#themsanpham').click(() => {
         $('#id01').css("display", "block");
+        $('#btnsendfix').val('Tạo');
       })
          
       
@@ -937,11 +938,69 @@ The above copyright notice and this permission notice shall be included in all c
     //   console.log(loai);
     // })
       $('#formcreate').on('submit',(e)=>{
+        let getnameform = $('#btnsendfix').val();
+        if(getnameform=='Sửa'){
+          
+          $('#_type').val('sua');
+          let flagg = false;
+          let tensp = $('#tensp').val();
+          let anh = $('#anh').val();
+          let gia = $('#gia').val();
+          let loai = $('#maloaisp').val();
+          let id = $('#id_').val();
+          if(tensp.length==0){
+          e.preventDefault();
+          $('#tensp').focus();
+          $('#error').text("Vui lòng đặt tên cho sản phẩm .....");
+          return false;
+        }else if(gia.length==0){
+          e.preventDefault();
+          $('#gia').focus();
+          $('#error').text("Vui lòng nhập giá sản phẩm.....");
+           return false;
+        }else if(loai==0){
+           e.preventDefault();
+          $('#maloaisp').focus();
+          $('#error').text("Vui lòng chọn mã loại sản phẩm .....");
+           return false;
+        }else if(anh.length!=0){
+          $('#error').text("");
+          let duoi = anh.split('.');
+          let duoifinal = duoi[duoi.length-1];
+          if(duoifinal!="png" && duoifinal!="jpg" && duoifinal!="jpeg"){
+            $('#error').text("Chỉ hổ trợ png,jpeg,jpg .....");
+            return false;
+          } 
+          flagg=true;
+        }
+        let objfixproduct = {id:id,_type:'sua',tensp:tensp, gia:gia,maloaisp : loai};
+        let anhfinally = anh.split('\\');
+        anh=anhfinally[anhfinally.length-1];
+        if(flagg==true){
+          objfixproduct.anh = anh;
+        }
+        console.log(objfixproduct);
+        $('#error').text("Sửa sản phẩm thành công !!!");
+        $.ajax({
+          url: '/addproduct', //I just want to know what webpage posted data
+          method: 'POST',
+          type: 'POST',
+          data: JSON.stringify(objfixproduct),
+          processData: false,
+          dataType: 'json', 
+          contentType: 'application/json; charset=utf-8',
+          success : (res)=>{
+            $('#error').text(res);
+          }
+        });
         
-        let tensp = $('#tensp').val();
-        let anh = $('#anh').val();
-        let gia = $('#gia').val();
-        let loai = $('#maloaisp').val();
+
+        }else{
+          $('#_type').val('tao');
+          let tensp = $('#tensp').val();
+          let anh = $('#anh').val();
+          let gia = $('#gia').val();
+          let loai = $('#maloaisp').val();
         if(tensp.length==0){
           e.preventDefault();
           $('#tensp').focus();
@@ -969,13 +1028,14 @@ The above copyright notice and this permission notice shall be included in all c
           $('#error').text("Chỉ hổ trợ png,jpeg,jpg .....");
           return false;
         }
-      
+        let anhfinally = anh.split('\\');
+        anh=anhfinally[anhfinally.length-1];
         $('#error').text("Thêm sản phẩm thành công !!!");
         $.ajax({
           url: '/addproduct', //I just want to know what webpage posted data
           method: 'POST',
           type: 'POST',
-          data: JSON.stringify({tensp:tensp, anh : anh, gia:gia,maloaisp : loai}),
+          data: JSON.stringify({_type:'tao',tensp:tensp, anh : anh, gia:gia,maloaisp : loai}),
           processData: false,
           dataType: 'json', 
           contentType: 'application/json; charset=utf-8',
@@ -983,6 +1043,21 @@ The above copyright notice and this permission notice shall be included in all c
             $('#error').text(res);
           }
         });
+        }
+      })
+
+      $('table').on('click','#fixproduct',function(){
+        $('#id01').css("display", "block");
+        var rowEl =  $(this).closest('tr');
+        var id = rowEl.find('#getid').val();
+        var ma = rowEl.find('#maproduct').text();
+        var ten = rowEl.find('#nameproduct').text();
+        var gia = rowEl.find('#priceproduct').text();
+        $('#tensp').val(ten);
+        $('#gia').val(gia);
+        $('#maloaisp').val(ma);
+        $('#btnsendfix').val('Sửa');
+        $('#id_').val(id);
       })
 
 

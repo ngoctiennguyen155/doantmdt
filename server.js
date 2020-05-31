@@ -643,9 +643,10 @@ app.put('/createaccout', async (req, res) => {
 });
 
 
-app.post('/addproduct', (req, res) => {
-  var getnamepicture;
-  var tensp, gia, loai;
+app.post('/addproduct',async (req, res) => {
+  let getnamepicture = req.body.anh;
+  console.log(getnamepicture);
+  
    const storage = multer.diskStorage({
     destination: function (req, file, cb) {
        if (
@@ -663,15 +664,13 @@ app.post('/addproduct', (req, res) => {
     },
   });
   var upload = multer({ storage: storage }).single('anh');
-  upload(req, res, function (err) {
+    upload(req, res,async function (err) {
     if (err) {
       console.log('Error : Somgthing went wrong !!!');
     }
-    console.log('Thêm sản phẩm thành công !!!');
-    console.log(req.body, req.file);
     let objproduct = {
       tensp: req.body.tensp,
-      fileanh: req.file.filename,
+      fileanh: req.body.anh,
       chitiet: "abc",
       gia: req.body.gia,
       maloaisp: req.body.maloaisp,
@@ -682,11 +681,20 @@ app.post('/addproduct', (req, res) => {
       hieuluc: 'het',
       noibat: false
     };
-    let newproduct = new allsp(objproduct);
-    newproduct.save();
-    console.log(objproduct);
-  });
+    if (req.body._type == 'tao') {
+      let newproduct = new allsp(objproduct);
+      newproduct.save(); 
+    
+    } else {
+      var objfixproduct = { tensp: req.body.tensp, gia: req.body.gia, maloaisp: req.body.maloaisp };
+      if (req.body.anh) {
+        objfixproduct.fileanh = req.body.anh;
+      }
+      await allsp.findByIdAndUpdate({ _id: new ObjectId(req.body.id) }, { $set: objfixproduct }, { new: true });
 
+    }
+    console.log(objfixproduct);
+  });
   
   res.redirect('/qlsanpham');
 })

@@ -679,7 +679,8 @@ app.post('/addproduct',async (req, res) => {
       phantram: 0,
       trangthai: 'het',
       hieuluc: 'het',
-      noibat: false
+      noibat: false,
+      ncc :{tenncc :"",gia:0,sdt:"",email:""},
     };
     if (req.body._type == 'tao') {
       let newproduct = new allsp(objproduct);
@@ -736,4 +737,18 @@ app.post('/sendemailtouser', async (req, res) => {
       }
   });
   res.send('Email đã gửi !!!');
+})
+app.get('/nhacungcap',async (req, res) => {
+  const spl = await allsp
+    .find({})
+    .sort({ sl: 1 });
+  //console.log(spl);
+  res.render('nhacungcap',{data:spl});
+})
+app.put('/updatencc', async (req, res) => {
+  console.log(req.body);
+  await allsp.findByIdAndUpdate({ _id: new ObjectId(req.body.id) },
+    { $set: { ncc: { tenncc: req.body.tenncc, gia: req.body.gia, sdt: req.body.sdt, email: req.body.email } } },
+    { new: true });
+  res.send('Update success ...');
 })

@@ -63,7 +63,7 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Thống kê</p>
             </a>
           </li>
-          <li class="nav-item active ">
+          <li class="nav-item ">
             <a class="nav-link" href="/qlsanpham">
               <i class="material-icons">content_paste</i>
               <p>Sản phẩm</p>
@@ -101,7 +101,7 @@ The above copyright notice and this permission notice shall be included in all c
               <p>Nhập hàng</p>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item active">
               <a class="nav-link" href="/nhacungcap">
                 <i class="material-icons"><i class="fas fa-cart-arrow-down"></i></i>
                 <p>Nhà cung cấp</p>
@@ -121,9 +121,7 @@ The above copyright notice and this permission notice shall be included in all c
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
           <div class="navbar-wrapper">
-            <a id="themsanpham" class="navbar-brand" href="javascript:;"
-                >Thêm sản phẩm <i class="fas fa-plus-square"></i
-              ></a>
+            Nhà cung cấp
           </div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
             <span class="sr-only">Toggle navigation</span>
@@ -190,8 +188,8 @@ The above copyright notice and this permission notice shall be included in all c
             <div class="col-md-12">
               <div class="card">
                 <div class="card-header card-header-primary">
-                  <h4 class="card-title ">Bảng sản phẩm</h4>
-                  <p class="card-category"> Quản lí các thông tin sản phẩm</p>
+                  <h4 class="card-title ">Bảng danh sách các nhà cung cấp</h4>
+                  <p class="card-category"> </p>
                   
                   <div id="id01" class="w3-modal popup" >
                     <div class="w3-modal-content">
@@ -211,31 +209,21 @@ The above copyright notice and this permission notice shall be included in all c
                           <p id="error"></p>
                           <form style="text-align: center;" id="formcreate" enctype="multipart/form-data" action="/addproduct" method="POST">
                             <div style="text-align: left;margin: 10px;">
-                              <label for="tensp" class="w30 mt5">Tên sản phẩm: </label>
-                              <input id="tensp" class="w60 mt5 ml5" type="text" placeholder="Tên sản phẩm" name="tensp"></br>
+                              <label for="tenncc" class="w30 mt5">Tên NCC: </label>
+                              <input id="tenncc" class="w60 mt5 ml5" type="text" placeholder="Tên nhà cung cấp"></br>
                              
                               <label for="gia" class="w30 mt5">Giá: </label>
-                              <input class="w60 mt5 ml5" id="gia" type="text" placeholder="Giá" name="gia"></br>
-                              <input type="hidden" value="" id="_type">
-                              <label class="mt5 w30" for="maloaisp" >Mã loại sp: </label>
-                              <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" name="maloaisp" >
-                                <option value="">Chọn mã sp</option>
-                                <option value="thit">Thịt</option>
-                                <option value="raucu">Rau củ</option>
-                                <option value="traicay">Trái cây</option>
-                                <option value="haisan">Hải sản</option>
-                                <option value="doanlien">Thức ăn nhanh</option>
-                                <option value="nuoc">Nước</option>
-                                <option value="sua">Sữa</option>
-                                <option value="banhkeo">Bánh kẹo</option>
-                              </select>
-                               <label for="anh" class="w30 mt5"> Ảnh: </label>
-                              <input id="anh" class="mt5 ml5 w60 "  type="file"  name="anh" accept="image/*" >
+                              <input class="w60 mt5 ml5" id="gia" type="text" placeholder="Giá" ></br>
+                              
+                              <label for="sdt" class="w30 mt5">SĐT: </label>
+                              <input id="sdt" class="w60 mt5 ml5" type="text" placeholder="SĐT"></br>
+                              <label for="email" class="w30 mt5">Email: </label>
+                              <input id="email" class="w60 mt5 ml5" type="text" placeholder="Email"></br>
                             </div>
                             <input type="hidden" value="" id="id_">
-                            <input id="btnsendfix" type="submit"
+                            <input id="fixncc" type="button"
                               class="btn btn-primary w50"
-                              value="Tạo"></input>
+                              value="Sửa"></input>
                           </form>
                         </div>
                         <div class="modal-footer" >
@@ -256,104 +244,59 @@ The above copyright notice and this permission notice shall be included in all c
                           ID
                         </th>
                         <th>
-                          Tên SP
+                          Tên NCC
                         </th>
                         <th>
-                          Ảnh SP
+                          Tên SP
                         </th>
                         <!-- <th>
                           Chi tiết
                         </th> -->
                         <th>
-                          Giá 
+                          Giá nhập
                         </th>
                         <th>
-                          Mã loại SP
+                          SĐT
                         </th>
                         <th>
-                          SL
-                        </th>
-                        <th>
-                          HSD
-                        </th>
-                        <th>
-                          % Giảm giá
-                        </th>
-                        <th>
-                          Trạng thái
-                        </th>
-                        <th>
-                          Hiệu lực
-                        </th>
-                        <th>
-                          Nổi bật
+                          Email
                         </th>
                         <th>
                           Sửa
                         </th>
+           
+                        
                       </thead>
                     
                       <tbody id="myTable" class="mx-10"  >
                         
-                        <%var r=0;data.forEach(e =>{r++%>
+                        <%var r=0;data.forEach(e =>{r++;%>
                           <tr>
                           <td>
                             <%=r%>
+                            <input type="hidden" value="<%=e._id%>" id="idproduct">
+                          </td>
+                          <td>
+                            <p id="namencc"><%=e.ncc.tenncc%></p>
                           </td>
                           <td>
                             <p id="nameproduct"><%=e.tensp%></p>
                           </td>
-                          <td>
-                            <img style="width: 100px;height: 100px;" src="/images/<%=e.maloaisp%>/<%=e.fileanh%>">
-                          </td>
-                          <!-- <td>
-                            <%=e.chitiet%>
-                          </td> -->
+                          
                           <td class="text-primary">
-                            <label id="priceproduct"><%=e.gia%></label> VNĐ
+                            <label id="pricencc"><%=e.ncc.gia%></label> VNĐ
                           </td>
                           <td>
-                            <p id="maproduct"><%=e.maloaisp%></p>
+                            <p id="sdtncc"><%=e.ncc.sdt%></p>
                           </td>
                           <td>
-                            <label id="sl"><%=e.sl%></label>
+                            <label id="emailncc"><%=e.ncc.email%></label>
                           </td>
+                         
                           <td>
-                            <%=e.hsd%>
+                            <a id="fixncc" href="javascript:;" style="font-size:20px"><i class="fas fa-tools"></i></a>
                           </td>
-                          <td>
-                            <input id="getid" type="hidden" value="<%=e._id%>">
-                            <input id="inputphantram" style="width: 50px;" type="number" name="quantity" min="0" max="100" value="<%=e.phantram%>">
-                            <a href="javascript:;" id="updatephantram"><i style="font-size: 20px;color: skyblue;" class="fas fa-level-up-alt"></i></a>
-                            
-                          </td>
-                          <td>
-                            <%if(e.trangthai=="het" ){%>
-                             <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Hết</a>
-                            <%}else { if(Number(e.sl)<=10){%>
-                              <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Còn</a>
-                              <%}else {%>
-                                <a href="javascript:;" id="trangthai">Còn</a>
-                              <%}}%>
-                          </td>
-                          <td>
-                            <%if(e.hieuluc=="het"){%>
-                           <a href="javascript:;" id="hieuluc">Hết</a>
-                            <%}else {%>
-                              <a href="javascript:;" id="hieuluc">Còn</a>
-                              <%}%>
-                          </td>
-                          <td>
-                            <%if(!e.noibat){%>
-                             <a href="javascript:;" ><i id="noibat" style="font-size: 1.7em;color: red;" class="far fa-times-circle"></i></a>
-                            <%}else {%>
-                             <a href="javascript:;" ><i id="noibat" style="font-size: 1.7em;color: red;" class="far fa-check-circle"></i></a>
-                              <%}%>
-                           
-                          </td>
-                          <td>
-                            <a id="fixproduct" href="javascript:;" style="font-size:20px" href="#"><i class="fas fa-tools"></i></a>
-                          </td>
+
                         </tr> 
                         <%})%>
                       </tbody>
@@ -801,271 +744,61 @@ The above copyright notice and this permission notice shall be included in all c
 
     $(document).ready(function(){
       //phantram
-      $('table').on('click','#updatephantram',function(){
+      $('table').on('click','#fixncc',function(){
+         $('#id01').css("display", "block");
         var rowEl =  $(this).closest('tr');
-        var id = rowEl.find('#getid').val();
-        var val = rowEl.find('#inputphantram').val();
-        var tam = $('#inputphantram').val();
+        var id = rowEl.find('#idproduct').val();
+        var tenncc = rowEl.find('#namencc').text();
+        var giancc = rowEl.find('#pricencc').text();
+        var sdt = rowEl.find('#sdtncc').text();
+        var email = rowEl.find('#emailncc').text();
+
+        console.log(id,tenncc,giancc,sdt,email);  
+
+        $('#tenncc').val(tenncc);
+        $('#id_').val(id);
+        $('#gia').val(giancc);
+        $('#sdt').val(sdt);
+        $('#email').val(email);
         //console.log(tam);
        //console.log(id);
         //console.log(val);
-        $.ajax({
-           url : '/updatephantram',
-           method:'PUT',
-           contentType:"application/json",
-           data : JSON.stringify({phantram : val,id:id}),
-           success : (res)=>{
-             alert(res.message);
-             if(res.status==0){
-               //alert(res.old);
-                rowEl.find('#inputphantram').val(res.old);
-             }
-           }
-        })
+     //    $.ajax({
+     //       url : '/updatephantram',
+     //       method:'PUT',
+     //       contentType:"application/json",
+     //       data : JSON.stringify({phantram : val,id:id}),
+     //       success : (res)=>{
+     //         alert(res.message);
+     //         if(res.status==0){
+     //           //alert(res.old);
+     //            rowEl.find('#inputphantram').val(res.old);
+     //         }
+     //       }
+     //    })
       })
-      
-      $('#themsanpham').click(() => {
-        $('#id01').css("display", "block");
-        $('#btnsendfix').val('Tạo');
-      })
-         
-      
-      //search
-      $('#inputsearch').on('keyup',function(){
-        var value = $(this).val().toLowerCase();
-        //alert(value);
-        $("#myTable tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      })
-
-      //noibat
-      $('table').on('click','#noibat',function(){
-        var rowEl =  $(this).closest('tr');
-        var id = rowEl.find('#getid').val();
-        var nameclass = rowEl.find('#noibat').attr('class');
-        //console.log(id);
-        //console.log(nameclass);
-        var noibat;
-        if(nameclass=='far fa-times-circle'){
-          rowEl.find('#noibat').removeClass(nameclass).addClass('far fa-check-circle');
-          noibat=false;
-        }else{
-          noibat=true;
-          rowEl.find('#noibat').removeClass(nameclass).addClass('far fa-times-circle');
-        }
-
-        $.ajax({
-           url : '/updatenoibat',
-           method:'PUT',
-           contentType:"application/json",
-           data : JSON.stringify({noibat :noibat,id:id}),
-           success : (res)=>{
-             alert(res.message);
-           }
-        })
-        
-      })
-      //trangthai
-      $('table').on('click','#trangthai',function(){
-        var rowEl =  $(this).closest('tr');
-        var id = rowEl.find('#getid').val();
-        var status = rowEl.find('#trangthai').text();
-        var sl = rowEl.find('#sl').text();
-
-        if(Number(sl)==0){
-          alert("Cant't open this product !!!");
-        }else{
-          if(status[0]==="C"){
-         // alert('1');
-          rowEl.find('#trangthai').text("Hết").css({"background-color":"red","color":"white","border-radius" : " 5px","padding":"5px"});
-        //style="background-color: red;color: white;border-radius: 5px;padding: 5px;"
-        }else{
-         // alert('2');
-          if(Number(sl)>10){
-          rowEl.find('#trangthai').text("Còn").removeAttr('style');
-          }
-          else{
-            rowEl.find('#trangthai').text("Còn").css({"background-color":"red","color":"white","border-radius" : " 5px","padding":"5px"});
-          }
-        }
-
+      $('#fixncc').click(()=>{
+          var t = $('#tenncc').val();
+          var i = $('#id_').val();
+          var g =$('#gia').val();
+          var s =$('#sdt').val();
+          var e =$('#email').val();
+          console.log(t,i,g,s,e);
           $.ajax({
-           url : '/updatetrangthai',
-           method:'PUT',
-           contentType:"application/json",
-           data : JSON.stringify({status :status,id:id}),
-           success : (res)=>{
-             alert(res.message);
+          url : '/updatencc',
+          method:'PUT',
+          contentType:"application/json",
+          data : JSON.stringify({id:i,tenncc:t,gia:g,sdt:s,email:e}),
+          success : (res)=>{
+             $('#error').text(res);
+             setTimeout(()=>{
+               $('#id01').css("display","none");
+               $('#error').text("");
+               window.location.href='http://localhost:3000/nhacungcap';
+             },2000);
            }
-        })
-        }
-      });
-
-      //hieuluc
-     $('table').on('click','#hieuluc',function(){
-        var rowEl =  $(this).closest('tr');
-        var id = rowEl.find('#getid').val();
-        var noibat = rowEl.find('#hieuluc').text();
-        var phantram = rowEl.find('#inputphantram').val();
-        //console.log(id,noibat,phantram);
-        if(Number(phantram)==0){
-          alert("Can't set on when % equal 0 !!!!");
-        }else {
-          var hieuluc;
-          if(noibat === "Hết"){
-            rowEl.find('#hieuluc').text('Còn');
-            hieuluc='con';
-          }else{
-            rowEl.find('#hieuluc').text('Hết');
-            hieuluc='het';
-          }
-          $.ajax({
-           url : '/updatehieuluc',
-           method:'PUT',
-           contentType:"application/json",
-           data : JSON.stringify({hieuluc :hieuluc,id:id}),
-           success : (res)=>{
-             alert(res.message);
-           }
-          })
-        }
+        })     
      })
-
-    // $("#btnsendfix").click(()=>{
-    
-    //   let tensp = $('#tensp').val();
-    //   let anh = $('#anh').val();
-    //   let gia = $('#gia').val();
-    //   let loai = $('#maloaisp').val();
-    //   console.log(tensp);
-    //   console.log(anh);
-    //   console.log(gia);
-    //   console.log(loai);
-    // })
-      $('#formcreate').on('submit',(e)=>{
-        let getnameform = $('#btnsendfix').val();
-        if(getnameform=='Sửa'){
-          
-          $('#_type').val('sua');
-          let flagg = false;
-          let tensp = $('#tensp').val();
-          let anh = $('#anh').val();
-          let gia = $('#gia').val();
-          let loai = $('#maloaisp').val();
-          let id = $('#id_').val();
-          if(tensp.length==0){
-          e.preventDefault();
-          $('#tensp').focus();
-          $('#error').text("Vui lòng đặt tên cho sản phẩm .....");
-          return false;
-        }else if(gia.length==0){
-          e.preventDefault();
-          $('#gia').focus();
-          $('#error').text("Vui lòng nhập giá sản phẩm.....");
-           return false;
-        }else if(loai==0){
-           e.preventDefault();
-          $('#maloaisp').focus();
-          $('#error').text("Vui lòng chọn mã loại sản phẩm .....");
-           return false;
-        }else if(anh.length!=0){
-          $('#error').text("");
-          let duoi = anh.split('.');
-          let duoifinal = duoi[duoi.length-1];
-          if(duoifinal!="png" && duoifinal!="jpg" && duoifinal!="jpeg"){
-            $('#error').text("Chỉ hổ trợ png,jpeg,jpg .....");
-            return false;
-          } 
-          flagg=true;
-        }
-        let objfixproduct = {id:id,_type:'sua',tensp:tensp, gia:gia,maloaisp : loai};
-        let anhfinally = anh.split('\\');
-        anh=anhfinally[anhfinally.length-1];
-        if(flagg==true){
-          objfixproduct.anh = anh;
-        }
-        console.log(objfixproduct);
-        $('#error').text("Sửa sản phẩm thành công !!!");
-        $.ajax({
-          url: '/addproduct', //I just want to know what webpage posted data
-          method: 'POST',
-          type: 'POST',
-          data: JSON.stringify(objfixproduct),
-          processData: false,
-          dataType: 'json', 
-          contentType: 'application/json; charset=utf-8',
-          success : (res)=>{
-            $('#error').text(res);
-          }
-        });
-        
-
-        }else{
-          $('#_type').val('tao');
-          let tensp = $('#tensp').val();
-          let anh = $('#anh').val();
-          let gia = $('#gia').val();
-          let loai = $('#maloaisp').val();
-        if(tensp.length==0){
-          e.preventDefault();
-          $('#tensp').focus();
-          $('#error').text("Vui lòng đặt tên cho sản phẩm .....");
-          return false;
-        }else if(gia.length==0){
-          e.preventDefault();
-          $('#gia').focus();
-          $('#error').text("Vui lòng nhập giá sản phẩm.....");
-           return false;
-        }else if(loai==0){
-           e.preventDefault();
-          $('#maloaisp').focus();
-          $('#error').text("Vui lòng chọn mã loại sản phẩm .....");
-           return false;
-        }else if(anh.length==0){
-          e.preventDefault();
-          $('#anh').focus();
-          $('#error').text("vui lòng thêm ảnh cho sản phẩm .....");
-           return false;
-        }
-        let duoi = anh.split('.');
-        let duoifinal = duoi[duoi.length-1];
-        if(duoifinal!="png" && duoifinal!="jpg" && duoifinal!="jpeg"){
-          $('#error').text("Chỉ hổ trợ png,jpeg,jpg .....");
-          return false;
-        }
-        let anhfinally = anh.split('\\');
-        anh=anhfinally[anhfinally.length-1];
-        $('#error').text("Thêm sản phẩm thành công !!!");
-        $.ajax({
-          url: '/addproduct', //I just want to know what webpage posted data
-          method: 'POST',
-          type: 'POST',
-          data: JSON.stringify({_type:'tao',tensp:tensp, anh : anh, gia:gia,maloaisp : loai}),
-          processData: false,
-          dataType: 'json', 
-          contentType: 'application/json; charset=utf-8',
-          success : (res)=>{
-            $('#error').text(res);
-          }
-        });
-        }
-      })
-
-      $('table').on('click','#fixproduct',function(){
-        $('#id01').css("display", "block");
-        var rowEl =  $(this).closest('tr');
-        var id = rowEl.find('#getid').val();
-        var ma = rowEl.find('#maproduct').text();
-        var ten = rowEl.find('#nameproduct').text();
-        var gia = rowEl.find('#priceproduct').text();
-        $('#tensp').val(ten);
-        $('#gia').val(gia);
-        $('#maloaisp').val(ma);
-        $('#btnsendfix').val('Sửa');
-        $('#id_').val(id);
-      })
-
 
      // document . ready
     });

@@ -67,6 +67,12 @@ const sanpham = mongoose.Schema({
   noibat: {
     type: Boolean,
   },
+  ncc: {
+    tenncc: { type: String, require: true },
+    gia: { type: Number, require: true },
+    sdt: { type: String, require: true },
+    email: { type: String, require: true },
+  },
 });
 sanpham.plugin(mongoosePaginate);
 module.exports = mongoose.model('sanphamm', sanpham);

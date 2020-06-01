@@ -700,14 +700,18 @@ app.post('/addproduct',async (req, res) => {
 })
 
 app.post('/sendemailtouser', async (req, res) => {
-  let htmlt = '<p>Nội dung: ' + req.body.noidung|| "" + '</p>';
+  let htmlt =
+    '<p>Nội dung: ' + req.body.noidung + '</p>';
   if (req.body.coupon) {
     //console.log(req.body);
     let newcoupon =await coupon.find({ ma: req.body.coupon,trangthai: 0 });
     if (newcoupon.length == 0) {
       res.send('Mã giảm giá không tồn tại hoặc đã được sử dụng !!!!'); return;
     } else {
-      htmlt += '<p>Tặng mã giảm giá: ' + req.body.coupon + '</p>';
+      htmlt +=
+        '<p>Tặng mã giảm giá: ' +
+        req.body.coupon +
+        '</p>';
       await coupon.findOneAndUpdate({ ma: req.body.coupon, trangthai: 0 },{trangthai : 1}, { new : true });
     }
   }

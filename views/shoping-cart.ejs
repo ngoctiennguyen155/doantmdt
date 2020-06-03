@@ -274,17 +274,7 @@
                             Upadate Cart</a> -->
             </div>
           </div>
-          <div class="col-lg-6">
-            <div class="shoping__continue">
-              <div class="shoping__discount">
-                <h5>Discount Codes</h5>
-                <form action="/add-coupon" method="POST">
-                  <input type="text" name="coupon" placeholder="Enter your coupon code" />
-                  <button type="submit" class="site-btn">APPLY COUPON</button>
-                </form>
-              </div>
-            </div>
-          </div>
+          
           <div class="col-lg-6">
             <div class="shoping__checkout">
               <h5>Cart Total</h5>
@@ -297,8 +287,20 @@
               
             </div>
           </div>
+         </form>
+         <div class="col-lg-6">
+          <div class="shoping__continue">
+            <div class="shoping__discount">
+              <h5>Discount Codes</h5>
+              <form action="/add-coupon" method="POST">
+                <input type="text" name="coupon" placeholder="Enter your coupon code" value="<%=coupon_code%>"  />
+                <button type="submit" class="site-btn">APPLY COUPON</button>
+              </form>
+            </div>
+          </div>
+        </div> 
         </div>
-      </form>
+      
 
       </div>
     </section>
@@ -322,7 +324,6 @@
  
 
 jQuery(document).ready(function(){
-  
     var price_total= 0;
     var qty_item=0;
    

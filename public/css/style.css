@@ -1044,6 +1044,13 @@ ol {
 	padding: 45px 0 40px;
 }
 
+
+.bill {
+	display: flex;
+	align-items: center;
+	width: 1000px;
+}
+
 .breadcrumb__text h2 {
 	font-size: 46px;
 	color: #ffffff;
@@ -2193,8 +2200,22 @@ ol {
 	padding: 30px;
 	padding-top: 30px;
 }
+.bill__order {
+	width: 1000px;
+	background: #f5f5f5;
+	padding: 30px;
+	padding-top: 30px;
+}
 
 .checkout__order h4 {
+	color: #1c1c1c;
+	font-weight: 700;
+	border-bottom: 1px solid #e1e1e1;
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+}
+
+.bill__order h4 {
 	color: #1c1c1c;
 	font-weight: 700;
 	border-bottom: 1px solid #e1e1e1;
@@ -2209,11 +2230,29 @@ ol {
 	margin-bottom: 10px;
 }
 
+.bill__order .checkout__order__products {
+	font-size: 18px;
+	color: #1c1c1c;
+	font-weight: 700;
+	margin-bottom: 10px;
+}
+
+
+
+
 .checkout__order .checkout__order__products span {
 	float: right;
 }
 
+.bill__order .checkout__order__products span {
+	float: right;
+}
+
 .checkout__order ul {
+	margin-bottom: 12px;
+}
+
+.bill__order ul {
 	margin-bottom: 12px;
 }
 
@@ -2224,10 +2263,34 @@ ol {
 	list-style: none;
 }
 
+.bill__order ul li {
+	font-size: 16px;
+	color: #6f6f6f;
+	line-height: 40px;
+	list-style: none;
+}
+
 .checkout__order ul li span {
 	font-weight: 700;
 	float: right;
 }
+
+.bill__order ul li span {
+	font-weight: 700;
+	float: right;
+}
+
+.bill__order .checkout__order__subtotal {
+	font-size: 18px;
+	color: #1c1c1c;
+	font-weight: 700;
+	border-bottom: 1px solid #e1e1e1;
+	border-top: 1px solid #e1e1e1;
+	padding-bottom: 15px;
+	margin-bottom: 15px;
+	padding-top: 15px;
+}
+
 
 .checkout__order .checkout__order__subtotal {
 	font-size: 18px;
@@ -2244,11 +2307,28 @@ ol {
 	float: right;
 }
 
+.bill__order .checkout__order__subtotal span {
+	float: right;
+}
+
 .checkout__order .checkout__input__checkbox label {
 	padding-left: 20px;
 }
 
+.bill__order .checkout__input__checkbox label {
+	padding-left: 20px;
+}
+
 .checkout__order .checkout__order__total {
+	font-size: 18px;
+	color: #1c1c1c;
+	font-weight: 700;
+	border-bottom: 1px solid #e1e1e1;
+	padding-bottom: 15px;
+	margin-bottom: 25px;
+}
+
+.bill__order .checkout__order__total {
 	font-size: 18px;
 	color: #1c1c1c;
 	font-weight: 700;
@@ -2268,6 +2348,20 @@ ol {
 	width: 100%;
 	margin-top: 10px;
 }
+
+
+.bill__order .checkout__order__total span {
+	float: right;
+	color: #dd2222;
+}
+
+.bill__order button {
+	font-size: 18px;
+	letter-spacing: 2px;
+	width: 100%;
+	margin-top: 10px;
+}
+
 
 /*---------------------
   Blog

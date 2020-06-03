@@ -1,2 +1,0 @@
-# doantmdt
-// con cho tuan 

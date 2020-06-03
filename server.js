@@ -8,15 +8,20 @@ const csrf = require('csurf');
 const bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
-const multer = require('multer');
-const nodemailer = require('nodemailer');
 require('dotenv/config');
-
+var arr_id = [];
 var router = require('express').Router();
+
+var arr_qty =[];
+var arr_sl =[];
+
 
 const passport = require('passport');
 // connect mongodb
 mongodb.set('useCreateIndex', true);
+mongodb.set('useFindAndModify', false);
+
+
 mongodb
   .connect(process.env.DB_CONNECT, {
     dbName: 'tmdt',
@@ -26,10 +31,11 @@ mongodb
   .then(() => {
     console.log('Connect database seccess !!!');
   });
+
+  
 var path = require('path');
 
 /// middleware
-app.use(express.json());
 app.use(express.static('./public'));
 //app.use(express.static(path.join(__dirname, 'public')));
 var Cart = require('./model/cart');
@@ -89,6 +95,7 @@ const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
 const dsspnoibat = require('./model/sanpham');
 const coupon = require('./model/coupon');
+const ObjectId = require('mongodb').ObjectID;
 
 app.get('/', async (req, res) => {
   const data = await dssanpham.find({
@@ -107,7 +114,7 @@ app.get('/', async (req, res) => {
     message: '',
     session: req.session.cart || cartnull,
   });
-  //console.log(session.cart);
+// req.session.destroy();
 });
 
 app.get('/index', async (req, res) => {
@@ -170,7 +177,6 @@ app.get('/shop-grid', async function (req, res, next) {
       locale: 'en',
     },
   };
-  //console.log(filter);
   filter.trangthai = "con";
   await allsp.paginate(filter, options, function (err, result) {
     if (err) {
@@ -188,68 +194,53 @@ app.get('/shop-grid', async function (req, res, next) {
       });
     }
   });
-
-  // await allsp
-  //       .find(filter)
-  //       .skip((perPage * page) - perPage)
-  //       .limit(perPage)
-  //       .exec(function(err, sanphamm) {
-  //           allsp.countDocuments().exec(function(err, count) {
-  //               if (err) return next(err)
-  //               res.render('shop-grid', {
-  //                 dssp: sanphamm,
-  //                 current: page,
-  //                 pages: Math.ceil(count / perPage),
-  //                 query: query,
-  //                 total: count
-  //               })
-  //           })
-  //       })
 });
-//app.use(mainroutes);
 
-//route shopping cart
 
-// app.use(passport.session());
-// app.use(function (req, res, next) {
-//   const session = req.session;
-//   next();
-// });
+
 
 app.get('/shoping-cart', function (req, res, next) {
   var cart = new Cart(req.session.cart || {});
-  //console.log(cart.genetateArr());
+  var coupon="";
+  if(req.session.coupon)
+  {
+    req.session.coupon=coupon;
+  }
+
   res.render('shoping-cart', {
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],
     subtotal: cart.totalPrice || 0,
+    coupon_code:coupon,
     phantram: 0,
   });
 });
 
+
+
+
+var giasell;
+
 app.get('/add-to-cart', function (req, res) {
   var id = req.query.id;
   var sl = req.query.sl;
-  // console.log(id);
-  // console.log(sl);
   var cart = new Cart(req.session.cart ? req.session.cart : {});
   allsp.findById(new ObjectId(id), function (err, product) {
     if (err) {
       return res.redirect('/');
     }
-    var giasell;
     if (product.hieuluc === 'con')
       giasell = product.gia - (product.gia * product.phantram) / 100;
     else giasell = product.gia;
     cart.add(product, product._id, sl, giasell);
     req.session.cart = cart;
-    console.log(req.session.cart);
     res.redirect('/');
   });
 });
 
+
+
 //route shop details
-var ObjectId = require('mongodb').ObjectID;
 var getitem = require('./model/sanpham');
 app.get('/shop-details', function (req, res) {
   var id = req.query.id;
@@ -266,7 +257,6 @@ app.get('/shop-details', function (req, res) {
     .catch((err) => {
       next(err);
     });
-  //console.log(item);
 });
 
 //route blog
@@ -277,20 +267,45 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout', { session: req.session.cart || cartnull });
 });
-app.post('/checkout', async function (req, res) {
+
+
+app.post('/checkout', async function (req, res, next) {
   var phantram;
-  const mac = req.body.coupon;
+  const mac = req.session.coupon;
   const newcoupon = await coupon.find({ ma: mac });
-  // console.log(newcoupon);
   if(!newcoupon[0]){phantram=0;}
   else{phantram=newcoupon[0].phantram} 
-
 var cart = new Cart(req.session.cart || {});
-// console.log(newcoupon[0]);
-var arr_qty =[];
+var totalQty=0;
+arr_qty=[];
+// if(!req.body.y)
+// {
 req.body.y.forEach(e=>{ 
-  arr_qty.push(e)
+  arr_qty.push(e);
+  totalQty++;
  });
+// }
+// else {
+// // alert("Don't have any item on cart");
+// res.redirect('/index'); ;}
+ arr_id=[];
+ for(var e in req.session.cart.items)
+ {
+   arr_id.push(e);
+ }
+ var arr_pro =  [];
+ arr_pro = cart.genetateArr();
+cart.totalPrice=0;
+cart.totalQty=totalQty;
+for (var i in arr_pro) {
+  if(!arr_qty[i])
+  {
+    cart.remove(arr_id[i]);
+  }
+  else
+  {cart.update( arr_pro[i].item,arr_id[i],arr_qty[i],giasell);}
+}
+req.session.cart = cart;
   res.render('checkout', {
     arr_qty: arr_qty,
     session: req.session.cart || cartnull,
@@ -298,12 +313,72 @@ req.body.y.forEach(e=>{
     subtotal: cart.totalPrice || 0,
     phantram: phantram,
   });
-  
 });
+
+const bill = require('./model/bill');
+app.post('/bill', async function (req, res, next) {
+var cart = new Cart(req.session.cart || {});
+var sll=0;
+var mang_cart =[];
+mang_cart= cart.genetateArr();
+for (var i in arr_id) {
+  var id = arr_id[i];
+find_id(id ,i);
+}
+  const bill_order = new bill({
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    street_address: req.body.street_address,
+    apartment_address:req.body.apartment_address,
+    phone: req.body.phone,
+    email: req.body.email,
+    bill:mang_cart,
+  });
+  bill_order.save();
+  res.redirect('/bill');
+});
+
+function find_id(id ,i)
+{
+  allsp.findById(new ObjectId(id), function (err, product) {
+    sll= product.sl; 
+    var now  = sll- arr_qty[i];
+    update (id , now);
+  });
+}
+
+function update (id , now)
+{
+  allsp.updateOne({_id:new ObjectId(id)}, {$set: { sl: now }}, {upsert: true}, function(err){
+  });
+}
+
+
+  
+
 
 //route admin
 app.get('/admin', function (req, res) {
   res.render('login');
+});
+app.get('/bill', async function (req, res, next) {
+  var phantram;
+  const mac = req.session.coupon;
+  const newcoupon = await coupon.find({ ma: mac });
+  if(!newcoupon[0]){phantram=0;}
+  else{phantram=newcoupon[0].phantram} 
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+console.log(cart);
+var mang = [];
+mang = cart.genetateArr();
+console.log(mang);
+  res.render('bill',{
+    session: req.session.cart || cartnull,
+    getcart: cart.genetateArr() || [],
+    subtotal: cart.totalPrice || 0,
+    phantram: phantram,
+  
+  });
 });
 app.get('/hoadon', function (req, res) {
   res.render('hoadon');
@@ -311,12 +386,10 @@ app.get('/hoadon', function (req, res) {
 app.get('/coupon',async function (req, res) {
   const coupon = require('./model/coupon');
   const datacoupon = await coupon.find({}).sort({ trangthai: 1,phantram:1 });
-  console.log(datacoupon);
   res.render('coupon', { data: datacoupon });
 })
 app.get('/qlsanpham',async function (req, res) {
   const spl = await allsp.find({}).sort({ sl: 1 });
-  //console.log(spl);
   res.render('qlsanpham',{data:spl});
 });
 //route admin
@@ -326,8 +399,6 @@ app.post('/admin',async function (req, res) {
   // create user in req.body
   const e = req.body.username;
   const pw = req.body.password;
-  console.log(e);
-  console.log(pw);
   let dataacc = await ac.find({});
   let dataac = [];
   dataac[0] = dataacc;
@@ -353,7 +424,6 @@ app.post('/admin',async function (req, res) {
 
 app.get('/taikhoan', async (req, res) => {
   const dataac = await ac.find({});
-  //console.log(dataac);
   zdadsfasdfa[0] = dataac;
   res.render('taikhoan', { dataac: zdadsfasdfa,user:zdadsfasdfa[1]});
 });
@@ -392,7 +462,6 @@ app.post('/mailsub',async (req, res) => {
   var email = req.body.email;
   const e = require('./model/mail');
   const gete = await e.find({ email: email });
-  console.log(gete);
   if (gete.length == 0) {
     const newe = new e({
       email: email,
@@ -403,22 +472,28 @@ app.post('/mailsub',async (req, res) => {
 })
 app.post('/validateemail', (req, res) => {
   var email = req.body.email;
-  console.log(email);
   const emailExistence = require('email-existence');
   emailExistence.check(email, function (error, response) {
     res.send(response);
   });
 })
+
+app.post('/continue', (req, res) => {
+  res.redirect('/');
+});
 //
 app.post('/add-coupon', async function (req, res) {
   const mac = req.body.coupon;
+  req.session.coupon = mac;
   const newcoupon = await coupon.find({ ma: mac });
-  console.log(newcoupon[0].phantram);
+
   var cart = new Cart(req.session.cart || {});
+
   res.render('shoping-cart', {
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],
     subtotal: cart.totalPrice || 0,
+    coupon_code:mac,
     phantram: newcoupon[0].phantram,
   });
 });
@@ -431,26 +506,22 @@ app.get('/thongke', (req, res) => {
 app.get('/mail',async (req, res) => {
   const mailschema = require('./model/mail');
   const getmail =await mailschema.find({});
-  console.log(getmail);
   res.render('mail',{mail : getmail});
 });
 
 app.get('/mailcontact', async (req, res) => {
   const mailcontactschema = require('./model/contact');
   const getmailcontact = await mailcontactschema.find({});
-  console.log(getmailcontact);
   res.render('mailcontact',{mailcontact : getmailcontact});
 });
 app.get('/magiamgia', async (req, res) => {
   const coupon = require('./model/coupon');
   const datacoupon = await coupon.find({}).sort({ trangthai: 1,phantram:1 });
-  console.log(datacoupon);
   res.render('magiamgia', { data: datacoupon });
 });
 
 app.get('/nhaphang',async (req, res) => {
   let gettableproduct =await allsp.find({});
-  //console.log(gettableproduct);
   res.render('nhaphang',{data:gettableproduct});
 })
 app.get('/xacnhannhaphang',(req, res) => {
@@ -474,9 +545,7 @@ app.put('/updatephantram',async (req, res) => {
       { new: true },
       (err, doc) => {
         if (err) {
-          console.log('update false');
         }
-        console.log(old);
       }
     );
     res.send({ message: 'Update success !!!',status:1});
@@ -488,7 +557,6 @@ app.put('/updatephantram',async (req, res) => {
 app.put('/updatenoibat',async (req, res) => {
   var id = req.body.id;
   var noibat = req.body.noibat;
-  console.log(id, noibat);
   allsp.findByIdAndUpdate(
     { _id: new ObjectId(id) },
     { $set: { noibat: !noibat } },
@@ -509,7 +577,6 @@ app.put('/updatetrangthai', async (req, res) => {
   if (status == "Hết") {
     status = "con";
   } else status = "het";
-  console.log(id, status);
   allsp.findByIdAndUpdate(
     { _id: new ObjectId(id) },
     { $set: { trangthai: status } },
@@ -527,7 +594,6 @@ app.put('/updatehieuluc', async (req, res) => {
   var id = req.body.id;
   var status = req.body.hieuluc;
 
-  console.log(id, status);
   allsp.findByIdAndUpdate(
     { _id: new ObjectId(id) },
     { $set: { hieuluc: status } },
@@ -545,7 +611,6 @@ app.put('/updatehieuluc', async (req, res) => {
 app.post('/creatcoupon', (req, res) => {
   var sl = req.body.sl;
   var phantram = req.body.phantram;
-  //console.log(sl);
   const randomString = require('randomstring');
   const newcoupon = require('./model/coupon');
   for (var i = 1; i <= sl; i++){
@@ -589,8 +654,6 @@ app.put('/createaccout', async (req, res) => {
  
   const salt =await bcrypt.genSalt(10);
   const pwhash = await await bcrypt.hash(req.body.password, salt);
-  console.log(salt);
-  console.log(pwhash);
   let checkmail = await ac.find({ email: email });
   let cout = checkmail.length;
   if (loai == "tao") {
@@ -628,7 +691,6 @@ app.put('/createaccout', async (req, res) => {
       objac.matkhau = await bcrypt.hash(req.body.password, salt);
     }
     if (pw.length == 0) {
-      console.log('adf');
     }
     await ac.findByIdAndUpdate(
       { _id: new ObjectId(id) },
@@ -639,116 +701,6 @@ app.put('/createaccout', async (req, res) => {
          res.send('Update accout success !!!');
       }
     );
+   
   }
 });
-
-
-app.post('/addproduct',async (req, res) => {
-  let getnamepicture = req.body.anh;
-  console.log(getnamepicture);
-  
-   const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-       if (
-         file.mimetype !== 'image/png' &&
-         file.mimetype !== 'image/jpg' &&
-         file.mimetype !== 'image/jpeg'
-       ) {
-         res.send('Error : Chỉ được upload file png,jpg,jpeg');
-         return false;
-       }
-      cb(null, './public/images/'+req.body.maloaisp);
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-  var upload = multer({ storage: storage }).single('anh');
-    upload(req, res,async function (err) {
-    if (err) {
-      console.log('Error : Somgthing went wrong !!!');
-    }
-    let objproduct = {
-      tensp: req.body.tensp,
-      fileanh: req.body.anh,
-      chitiet: "abc",
-      gia: req.body.gia,
-      maloaisp: req.body.maloaisp,
-      sl: "0",
-      hsd: "1 tháng",
-      phantram: 0,
-      trangthai: 'het',
-      hieuluc: 'het',
-      noibat: false,
-      ncc :{tenncc :"",gia:0,sdt:"",email:""},
-    };
-    if (req.body._type == 'tao') {
-      let newproduct = new allsp(objproduct);
-      newproduct.save(); 
-    
-    } else {
-      var objfixproduct = { tensp: req.body.tensp, gia: req.body.gia, maloaisp: req.body.maloaisp };
-      if (req.body.anh) {
-        objfixproduct.fileanh = req.body.anh;
-      }
-      await allsp.findByIdAndUpdate({ _id: new ObjectId(req.body.id) }, { $set: objfixproduct }, { new: true });
-
-    }
-    console.log(objfixproduct);
-  });
-  
-  res.redirect('/qlsanpham');
-})
-
-app.post('/sendemailtouser', async (req, res) => {
-  let htmlt =
-    '<p>Nội dung: ' + req.body.noidung + '</p>';
-  if (req.body.coupon) {
-    //console.log(req.body);
-    let newcoupon =await coupon.find({ ma: req.body.coupon,trangthai: 0 });
-    if (newcoupon.length == 0) {
-      res.send('Mã giảm giá không tồn tại hoặc đã được sử dụng !!!!'); return;
-    } else {
-      htmlt +=
-        '<p>Tặng mã giảm giá: ' +
-        req.body.coupon +
-        '</p>';
-      await coupon.findOneAndUpdate({ ma: req.body.coupon, trangthai: 0 },{trangthai : 1}, { new : true });
-    }
-  }
-  var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env._EMAIL,
-      pass: process.env._PASSWORD,
-    },
-  });
-  var mailOptions = {
-    from: 'OGANI <' + process.env._EMAIL + '>',
-    to: req.body.email,
-    subject: req.body.tieude,
-    html: htmlt,
-  };
-  transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-  });
-  res.send('Email đã gửi !!!');
-})
-app.get('/nhacungcap',async (req, res) => {
-  const spl = await allsp
-    .find({})
-    .sort({ sl: 1 });
-  //console.log(spl);
-  res.render('nhacungcap',{data:spl});
-})
-app.put('/updatencc', async (req, res) => {
-  console.log(req.body);
-  await allsp.findByIdAndUpdate({ _id: new ObjectId(req.body.id) },
-    { $set: { ncc: { tenncc: req.body.tenncc, gia: req.body.gia, sdt: req.body.sdt, email: req.body.email } } },
-    { new: true });
-  res.send('Update success ...');
-})

@@ -320,7 +320,12 @@ app.post('/bill', async function (req, res, next) {
 var cart = new Cart(req.session.cart || {});
 var sll=0;
 var phantram;
-  const mac = req.session.coupon;
+  var mac ;
+  mac=req.session.coupon;
+  if(!mac)
+  {
+    mac="no";
+  }
   const newcoupon = await coupon.find({ ma: mac });
   if(!newcoupon[0]){phantram=0;}
   else{phantram=newcoupon[0].phantram} 

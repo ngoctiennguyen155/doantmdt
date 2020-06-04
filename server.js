@@ -319,7 +319,17 @@ const bill = require('./model/bill');
 app.post('/bill', async function (req, res, next) {
 var cart = new Cart(req.session.cart || {});
 var sll=0;
+var phantram;
+  const mac = req.session.coupon;
+  const newcoupon = await coupon.find({ ma: mac });
+  if(!newcoupon[0]){phantram=0;}
+  else{phantram=newcoupon[0].phantram} 
+
 var mang_cart =[];
+
+var total_payment=cart.totalPrice*(100-phantram)/100;
+
+
 mang_cart= cart.genetateArr();
 for (var i in arr_id) {
   var id = arr_id[i];
@@ -332,6 +342,10 @@ find_id(id ,i);
     apartment_address:req.body.apartment_address,
     phone: req.body.phone,
     email: req.body.email,
+    coupon: mac,
+    discount_percent : phantram,
+    total_order_value: cart.totalPrice,
+    total_payment:  total_payment,
     bill:mang_cart,
   });
   bill_order.save();
@@ -368,10 +382,10 @@ app.get('/bill', async function (req, res, next) {
   if(!newcoupon[0]){phantram=0;}
   else{phantram=newcoupon[0].phantram} 
   var cart = new Cart(req.session.cart ? req.session.cart : {});
-console.log(cart);
+// console.log(cart);
 var mang = [];
 mang = cart.genetateArr();
-console.log(mang);
+// console.log(mang);
   res.render('bill',{
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],

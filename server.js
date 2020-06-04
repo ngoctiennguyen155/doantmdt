@@ -13,10 +13,12 @@ const nodemailer = require('nodemailer');
 require('dotenv/config');
 
 var router = require('express').Router();
-
+var arr_qty =[];
+var arr_sl =[];
 const passport = require('passport');
 // connect mongodb
 mongodb.set('useCreateIndex', true);
+mongodb.set('useFindAndModify', false);
 mongodb
   .connect(process.env.DB_CONNECT, {
     dbName: 'tmdt',
@@ -89,6 +91,7 @@ const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
 const dsspnoibat = require('./model/sanpham');
 const coupon = require('./model/coupon');
+const ObjectId = require('mongodb').ObjectID;
 
 app.get('/', async (req, res) => {
   const data = await dssanpham.find({
@@ -218,38 +221,41 @@ app.get('/shop-grid', async function (req, res, next) {
 
 app.get('/shoping-cart', function (req, res, next) {
   var cart = new Cart(req.session.cart || {});
-  //console.log(cart.genetateArr());
+  var coupon="";
+  if(req.session.coupon)
+  {
+    req.session.coupon=coupon;
+  }
+
   res.render('shoping-cart', {
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],
     subtotal: cart.totalPrice || 0,
+    coupon_code:coupon,
     phantram: 0,
   });
 });
 
+var giasell;
 app.get('/add-to-cart', function (req, res) {
   var id = req.query.id;
   var sl = req.query.sl;
-  // console.log(id);
-  // console.log(sl);
   var cart = new Cart(req.session.cart ? req.session.cart : {});
   allsp.findById(new ObjectId(id), function (err, product) {
     if (err) {
       return res.redirect('/');
     }
-    var giasell;
     if (product.hieuluc === 'con')
       giasell = product.gia - (product.gia * product.phantram) / 100;
     else giasell = product.gia;
     cart.add(product, product._id, sl, giasell);
     req.session.cart = cart;
-    console.log(req.session.cart);
     res.redirect('/');
   });
 });
 
 //route shop details
-var ObjectId = require('mongodb').ObjectID;
+
 var getitem = require('./model/sanpham');
 app.get('/shop-details', function (req, res) {
   var id = req.query.id;
@@ -277,20 +283,43 @@ app.get('/blog', function (req, res) {
 app.get('/checkout', function (req, res) {
   res.render('checkout', { session: req.session.cart || cartnull });
 });
-app.post('/checkout', async function (req, res) {
+app.post('/checkout', async function (req, res, next) {
   var phantram;
-  const mac = req.body.coupon;
+  const mac = req.session.coupon;
   const newcoupon = await coupon.find({ ma: mac });
-  // console.log(newcoupon);
   if(!newcoupon[0]){phantram=0;}
   else{phantram=newcoupon[0].phantram} 
-
 var cart = new Cart(req.session.cart || {});
-// console.log(newcoupon[0]);
-var arr_qty =[];
+var totalQty=0;
+arr_qty=[];
+// if(!req.body.y)
+// {
 req.body.y.forEach(e=>{ 
-  arr_qty.push(e)
+  arr_qty.push(e);
+  totalQty++;
  });
+// }
+// else {
+// // alert("Don't have any item on cart");
+// res.redirect('/index'); ;}
+ arr_id=[];
+ for(var e in req.session.cart.items)
+ {
+   arr_id.push(e);
+ }
+ var arr_pro =  [];
+ arr_pro = cart.genetateArr();
+cart.totalPrice=0;
+cart.totalQty=totalQty;
+for (var i in arr_pro) {
+  if(!arr_qty[i])
+  {
+    cart.remove(arr_id[i]);
+  }
+  else
+  {cart.update( arr_pro[i].item,arr_id[i],arr_qty[i],giasell);}
+}
+req.session.cart = cart;
   res.render('checkout', {
     arr_qty: arr_qty,
     session: req.session.cart || cartnull,
@@ -298,7 +327,84 @@ req.body.y.forEach(e=>{
     subtotal: cart.totalPrice || 0,
     phantram: phantram,
   });
+});
+
+const bill = require('./model/bill');
+app.post('/bill', async function (req, res, next) {
+var cart = new Cart(req.session.cart || {});
+var sll=0;
+var phantram;
+  var mac ;
+  mac=req.session.coupon;
+  if(!mac)
+  {
+    mac="no";
+  }
+  const newcoupon = await coupon.find({ ma: mac });
+  if(!newcoupon[0]){phantram=0;}
+  else{phantram=newcoupon[0].phantram} 
+
+var mang_cart =[];
+
+var total_payment=cart.totalPrice*(100-phantram)/100;
+
+
+mang_cart= cart.genetateArr();
+for (var i in arr_id) {
+  var id = arr_id[i];
+find_id(id ,i);
+}
+  const bill_order = new bill({
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    street_address: req.body.street_address,
+    apartment_address:req.body.apartment_address,
+    phone: req.body.phone,
+    email: req.body.email,
+    coupon: mac,
+    discount_percent : phantram,
+    total_order_value: cart.totalPrice,
+    total_payment:  total_payment,
+    bill:mang_cart,
+  });
+  bill_order.save();
+  res.redirect('/bill');
+});
+
+function find_id(id ,i)
+{
+  allsp.findById(new ObjectId(id), function (err, product) {
+    sll= product.sl; 
+    var now  = sll- arr_qty[i];
+    update (id , now);
+  });
+}
+
+function update (id , now)
+{
+  allsp.updateOne({_id:new ObjectId(id)}, {$set: { sl: now }}, {upsert: true}, function(err){
+  });
+}
+
+
+app.get('/bill', async function (req, res, next) {
+  var phantram;
+  const mac = req.session.coupon;
+  const newcoupon = await coupon.find({ ma: mac });
+  if(!newcoupon[0]){phantram=0;}
+  else{phantram=newcoupon[0].phantram} 
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+// console.log(cart);
+var mang = [];
+mang = cart.genetateArr();
+// console.log(mang);
+  res.render('bill',{
+    session: req.session.cart || cartnull,
+    getcart: cart.genetateArr() || [],
+    subtotal: cart.totalPrice || 0,
+    phantram: phantram,
   
+  });
 });
 
 //route admin
@@ -308,12 +414,13 @@ app.get('/admin', function (req, res) {
 app.get('/hoadon', function (req, res) {
   res.render('hoadon');
 })
+
 app.get('/coupon',async function (req, res) {
   const coupon = require('./model/coupon');
   const datacoupon = await coupon.find({}).sort({ trangthai: 1,phantram:1 });
-  console.log(datacoupon);
   res.render('coupon', { data: datacoupon });
 })
+
 app.get('/qlsanpham',async function (req, res) {
   const spl = await allsp.find({}).sort({ sl: 1 });
   //console.log(spl);
@@ -412,13 +519,16 @@ app.post('/validateemail', (req, res) => {
 //
 app.post('/add-coupon', async function (req, res) {
   const mac = req.body.coupon;
+  req.session.coupon = mac;
   const newcoupon = await coupon.find({ ma: mac });
-  console.log(newcoupon[0].phantram);
+
   var cart = new Cart(req.session.cart || {});
+
   res.render('shoping-cart', {
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],
     subtotal: cart.totalPrice || 0,
+    coupon_code:mac,
     phantram: newcoupon[0].phantram,
   });
 });

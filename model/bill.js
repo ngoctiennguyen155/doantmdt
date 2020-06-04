@@ -17,26 +17,51 @@ const bill = mongoose.Schema({
           type: String,
           required: true,
           min: 1,
-          max:10000
+          max:1000
      },
      apartment_address: {
         type: String,
         required: true,
         min: 1,
-        max:10000
+        max:1000
    },
      phone: {
         type: String,
         required: true,
         min: 1,
-        max:10000
+        max:1000
    },
    email: {
     type: String,
     required: true,
     min: 1,
-    max:10000
+    max:1000
 },
+coupon: {
+     type: String,
+     required: true,
+     min: 1,
+     max:1000
+ },
+discount_percent: {
+     type: String,
+     required: true,
+     min: 1,
+     max:1000
+ },
+ total_order_value: {
+     type: String,
+     required: true,
+     min: 1,
+     max:1000
+ },
+ total_payment: {
+     type: String,
+     required: true,
+     min: 1,
+     max:1000
+ },
+
 bill: {
      type: Array,
      required: true,

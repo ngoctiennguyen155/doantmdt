@@ -91,6 +91,8 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const cartnull = { item: {}, totalQty: 0, totalPrice: Number(0) };
 const allsp = require('./model/sanpham');
 const dssanpham = require('./model/sanpham');
+const bill = require('./model/bill');
+
 const dsspnoibat = require('./model/sanpham');
 const coupon = require('./model/coupon');
 const ObjectId = require('mongodb').ObjectID;
@@ -300,15 +302,24 @@ req.body.y.forEach(e=>{
   arr_qty.push(e);
   totalQty++;
  });
-// }
-// else {
-// // alert("Don't have any item on cart");
-// res.redirect('/index'); ;}
+
  arr_id=[];
  for(var e in req.session.cart.items)
  {
    arr_id.push(e);
  }
+
+//  for(var e in arr_id)
+//  { var sl_mua=arr_qty[e];
+//   if(!check_sl(arr_id[e], sl_mua))
+//   {
+    
+
+//     return res.redirect('shoping-cart');
+//     break;
+//   }
+// }
+ 
  var arr_pro =  [];
  arr_pro = cart.genetateArr();
 cart.totalPrice=0;
@@ -331,7 +342,22 @@ req.session.cart = cart;
   });
 });
 
-const bill = require('./model/bill');
+// function check_sl(id , sl){
+//   allsp.findById(new ObjectId(id), function (err, product) {
+//     console.log("so luong kiem tra");
+//     console.log( product.sl);
+//     console.log("so luong mua");
+//     console.log( sl);
+//     if(sl>product.sl)
+//     {
+//       console.log("vuot qua so luong kho");
+//       return false;
+//     }
+//   });
+// }
+
+
+
 app.post('/bill', async function (req, res, next) {
 var cart = new Cart(req.session.cart || {});
 var sll=0;
@@ -378,6 +404,7 @@ function find_id(id ,i)
   allsp.findById(new ObjectId(id), function (err, product) {
     sll= product.sl; 
     var now  = sll- arr_qty[i];
+   
     update (id , now);
   });
 }
@@ -413,9 +440,48 @@ mang = cart.genetateArr();
 app.get('/admin', function (req, res) {
   res.render('login');
 });
-app.get('/hoadon', function (req, res) {
-  res.render('hoadon');
+
+app.get('/hoadon', async function (req, res,next) {
+  const data = await bill.find({ });
+  var from = "";
+  var to = "";
+  data.forEach(bill => {
+
+  });
+  res.render('hoadon',{
+    listbill: data,
+    day_from: from,
+    day_to: to ,
+  });
 })
+
+
+
+app.post('/findbyday', async function (req, res,next) {
+  const data = await bill.find({ });
+  var data_find = [];
+  var from  = req.body.from ; 
+  var to =  req.body.to;
+  var date_from = new Date(from);
+  var date_to = new Date(to);
+  data.forEach(bill => {
+   if(  date_from.getTime()<= bill.date.getTime()  && bill.date.getTime()<= date_to.getTime()+86400000 )
+   {
+          
+      data_find.push(bill);
+
+   }
+  });  
+
+   res.render('hoadon',{
+    listbill: data_find,
+    day_from: from,
+    day_to: to ,
+  });
+
+});
+
+
 
 app.get('/coupon',async function (req, res) {
   const coupon = require('./model/coupon');

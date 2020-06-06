@@ -6,9 +6,11 @@ const mongodb = require('mongoose');
 const cors = require('cors');
 const csrf = require('csurf');
 const bcrypt = require('bcrypt');
+const excelToJson = require('convert-excel-to-json');
 var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
 const multer = require('multer');
+const utf8 = require('utf8');
 const nodemailer = require('nodemailer');
 require('dotenv/config');
 
@@ -563,8 +565,15 @@ app.get('/nhaphang',async (req, res) => {
   //console.log(gettableproduct);
   res.render('nhaphang',{data:gettableproduct});
 })
-app.get('/xacnhannhaphang',(req, res) => {
-  res.render('xacnhannhaphang');
+app.get('/xacnhannhaphang', async (req, res) => {
+  const nhaphang = require('./model/phieunhap');
+  const dsn = await nhaphang.find({}).sort({ status: 1 });
+  console.log(dsn[0].dsnhap);
+  dsn[0].dsnhap.forEach(e => {
+    console.log(typeof e.tensp);
+    console.log(e.tensp.length);
+  })
+  res.render('xacnhannhaphang',{data : dsn});
 })
 
 
@@ -861,4 +870,155 @@ app.put('/updatencc', async (req, res) => {
     { $set: { ncc: { tenncc: req.body.tenncc, gia: req.body.gia, sdt: req.body.sdt, email: req.body.email } } },
     { new: true });
   res.send('Update success ...');
+})
+app.put('/updatedonhang',async (req, res)=>{
+  const donhang = require('./model/phieunhap');
+  await donhang.findByIdAndUpdate({
+    _id : new ObjectId(req.body.id)
+  },
+    {
+      $set: { status: req.body.status }
+    }, {
+    new: true
+  });
+  res.send('Thực hiện thành công...');
+});
+app.post('/dathang',async (req, res) => {
+  const donhang = require('./model/phieunhap');
+  const objdonhang = {
+    dsnhap: [],
+    status: 0,
+    nguoilap: 'nv1',
+  }
+  const donhanglist = req.body.data;
+  for ([key, value] of donhanglist){
+    const gettensp = await allsp.findById({ _id: new ObjectId(key) });
+    let objecttensp =gettensp.tensp;
+    //console.log(objecttensp, objecttensp.length);
+    
+    objdonhang.dsnhap.push({
+      id : key,
+      tensp: objecttensp,
+      sl: value,
+      nguoikt: '',
+      trangthai:false,
+    })
+  }
+  
+  const newdonhang = new donhang(objdonhang);
+  console.log(newdonhang);
+  await newdonhang.save();
+  res.send('Đơn hàng đã được gửi đến quản lý !!!');
+})
+app.put('/capnhatdonhang',async (req, res) => {
+  const donhang = require('./model/phieunhap');
+  const getdonhang = await donhang.find({ "status": 1, "dsnhap.tensp" : req.body.tensp, "dsnhap.sl" : req.body.sl });
+  if (getdonhang.length == 0) {
+    res.send('Không tìm thấy đơn hàng !!!');
+  } else {
+    
+    await donhang.findOneAndUpdate(
+      {
+        'status': 1,
+        'dsnhap.tensp': req.body.tensp,
+        'dsnhap.sl': req.body.sl,
+      },
+      {
+        $set: {
+          'dsnhap.$.nguoikt': 'nv1',
+          'dsnhap.$.trangthai': true,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(getdonhang);
+    
+  }
+})
+app.post('/updatesoluongsanpham',async (req, res) => {
+  var storage2 = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './upload');
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+
+  var upload2 = multer({ storage: storage2 }).single('exel');
+  upload2(req, res,async function (err) {
+    // console.log(req.file);
+    const result = excelToJson({
+      sourceFile: './upload/'+req.file.filename,
+      sheets: [{
+        name: 'Sheet1',
+        header: {
+          rows: 1
+        },
+        columnToKey: {
+          B: 'tensp',
+          C: 'soluong'
+        }
+      }],
+    });
+    //console.log(result.Sheet1);
+    // update donhang, e là từng phiếu nhập
+    let arrayphieunhap = result.Sheet1;
+    const hoadon = require('./model/phieunhap');
+    arrayphieunhap.forEach(async(e) => {
+      console.log(e);
+      const getphieunhap = await hoadon.find({ status: 1,dsnhap:{$elemMatch :{tensp : e.tensp,sl:e.soluong,trangthai:false} } });
+      //console.log(getphieunhap);
+      if (getphieunhap.length == 0) {
+        console.log('Không thể cập nhật số lượng sản phẩm: ' + e.tensp);
+      } else {
+        let getdsnhapphieunhap = getphieunhap[0].dsnhap;
+        //console.log(getdsnhapphieunhap);
+        getdsnhapphieunhap.forEach(async(ee) => {
+          if (ee.tensp == e.tensp) {
+            await hoadon.findOneAndUpdate(
+              {
+                status: 1,
+                dsnhap: {
+                  $elemMatch: {
+                    tensp: e.tensp,
+                    sl: e.soluong,
+                    trangthai: false,
+                  },
+                },
+              },
+              {
+                $set: {
+                  'dsnhap.$.nguoikt': 'nv1',
+                  'dsnhap.$.trangthai': true,
+                },
+              },
+              {
+                new: true,
+              }
+            );
+            let getproductupdate = await allsp.find({ tensp: ee.tensp });
+            let getoldsl = Number(getproductupdate[0].sl);
+            let getidproductupdate = getproductupdate._id;
+            await allsp.findOneAndUpdate(
+              { tensp: ee.tensp },
+              { $set: { sl: getoldsl + e.soluong } },
+              { new: true }
+            );
+            console.log(e.tensp +' Update soluong success!!!');
+          }
+        })
+      }
+    })
+      //
+    if (err instanceof multer.MulterError) {
+      console.log('error multerupload excel');
+    } else if(err) {
+      console.log('error unknow when upload excel');
+    }
+    console.log('Uploadexcel success !!!');
+  })
+  res.redirect('/nhaphang');
 })

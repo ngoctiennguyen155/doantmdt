@@ -48,6 +48,19 @@ The above copyright notice and this permission notice shall be included in all c
     />
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="../assets/demo/demo.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("#tim").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#searchdssp>tr>td").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+
+</script>
   </head>
 
   <body class="">
@@ -126,11 +139,13 @@ The above copyright notice and this permission notice shall be included in all c
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/nhacungcap">
-                <i class="material-icons"><i class="fas fa-cart-arrow-down"></i></i>
+                <i class="material-icons"
+                  ><i class="fas fa-cart-arrow-down"></i
+                ></i>
                 <p>Nhà cung cấp</p>
               </a>
             </li>
-           
+
             <!-- <li class="nav-item active-pro ">
             <a class="nav-link" href="./upgrade.html">
               <i class="material-icons">unarchive</i>
@@ -145,9 +160,21 @@ The above copyright notice and this permission notice shall be included in all c
         <nav
           class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top"
         >
-          <div class="container-fluid ">
+          <div class="container-fluid">
             <div class="navbar-wrapper">
-              <a class="navbar-brand" href="javascript:;" style="padding-left: 20px;padding-right: 20px;">Nhập hàng<i style="padding-left: 10px;" class="fas fa-upload"></i></a>
+               <a
+                class="navbar-brand"
+                style="padding-left: 20px; padding-right: 20px;"
+                >Nhập hàng<i
+                  style="padding-left: 10px;"
+                  class="fas fa-upload"
+                ></i
+              ></a>
+              <form method="post" enctype="multipart/form-data" action="/updatesoluongsanpham" id="formsubmitexcel">
+                <input type="file" name="exel" id="fileSelect" accept=".xlsx"/>
+                <input type="submit" value="Cập nhật" id="submitexel">
+              </form>
+              
             </div>
             <button
               class="navbar-toggler"
@@ -244,28 +271,28 @@ The above copyright notice and this permission notice shall be included in all c
                       Sau khi tạo, phiếu nhập hàng sẽ được xử lý
                     </p>
                   </div>
-                  <div class="card-body ">
+                  <div class="card-body">
                     <div class="container">
                       <div class="row">
                         <div class="col-sm-6 mx-10" style="text-align: center;">
-                         <input
-                                id="tim"
-                                  type="text"
-                                  value=""
-                                  class="form-control"
-                                  placeholder="Search..."
-                                />
+                          <input
+                            id="tim"
+                            type="text"
+                            value=""
+                            class="form-control"
+                            placeholder="Search..."
+                          />
                           <table id="dssp" class="table">
                             <thead class="text-primary">
                               <th>
                                 Tên sản phẩm
                               </th>
-                              
                             </thead>
-                            <tbody>
+                            <tbody id="searchdssp">
                               <%data.forEach(e=>{%>
                               <tr>
                                 <td>
+                                  <input type="hidden" value="<%=e._id%>" id="id_product">
                                   <p id="tensp"><%=e.tensp%></p>
                                 </td>
                                 <td>
@@ -295,20 +322,22 @@ The above copyright notice and this permission notice shall be included in all c
                           </table>
                         </div>
                         <!-- <div class="col-sm-2"></div> -->
-                        <div class="col-sm-6 " style="text-align: center;">
+                        <div class="col-sm-6" style="text-align: center;">
                           <div class="mx-10">
-                          <table id="order"  class="table" style="margin-top: 12px;">
-                            <thead class="text-primary">
-                              <th>
-                                Danh sách sản phẩm cần đặt
-                              </th>
-                              <th></th>
-                            </thead>
-                            <tbody>
-                           
-                              
-                             
-                              <!-- <tr>
+                            <p id="output"></p>
+                            <table
+                              id="order"
+                              class="table"
+                              style="margin-top: 12px;"
+                            >
+                              <thead class="text-primary">
+                                <th>
+                                  Danh sách sản phẩm cần đặt
+                                </th>
+                                <th></th>
+                              </thead>
+                              <tbody>
+                                <!-- <tr>
                                 <td>
                                   name
                                 </td>
@@ -321,11 +350,11 @@ The above copyright notice and this permission notice shall be included in all c
                                   ></a>
                                 </td>
                               </tr> -->
-                            </tbody>
-                          </table>
-                          
-                        </div>
-                        <button id="send" 
+                              </tbody>
+                            </table>
+                          </div>
+                          <button
+                            id="send"
                             style="
                               padding: 5px 30px 5px 30px;
                               border: none;
@@ -336,6 +365,7 @@ The above copyright notice and this permission notice shall be included in all c
                           >
                             Gửi
                           </button>
+                          
                         </div>
                       </div>
                     </div>
@@ -807,36 +837,97 @@ The above copyright notice and this permission notice shall be included in all c
       });
     </script>
     <script>
-         $(document).ready(()=>{
-               $('#dssp').on('click','#add',function(){
-                    var rowEl =  $(this).closest('tr');
-                    var name = rowEl.find('#tensp').text();
-                    //alert(name);
-                    
-     $('#order > tbody:last-child').append('<tr><td><p id="tenor">'+name+'</p></td><td><input id="sl" type="number" min="1"'+' value="1"style="width:100px"> '+
-                         '</td><td><a href="javascript:;" id="delete"><i style="font-size: 20px;" class="fas fa-times-circle"></i></a></td></tr>');
-               });
-               $('#order').on('click','#delete',function(){
-                    $(this).closest('tr').remove();
-               });
-               $("#tim").on("keyup", function() {
-                    var value = $(this).val().toLowerCase();
-                    $("#dssp tr").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                    });
-               });
-               var arr=[];
-               $('#send').click(()=>{
-                    $('#order tr').each(function (a, b) {
-                         var name = $('#tenor', b).text();
-                         var sl = $('#sl', b).val();
-                         arr.push({name:name,sl:sl});
-                    });
-                    arr.forEach(e=>{
-                         console.log(e.name , e.sl);
-                    })
-               })
-         })
+      $(document).ready(() => {
+        $('#dssp').on('click', '#add', function () {
+          var rowEl = $(this).closest('tr');
+          var name = rowEl.find('#tensp').text();
+          var id = rowEl.find('#id_product').val();
+          
+          //alert(name);
+
+          $('#order > tbody:last-child').append(
+            '<tr><td><p id="tenor">' +
+              name +
+              '</p><input id="id2" type="hidden" value="'+id+'"'+
+              '</td><td><input id="sl" type="number" min="1"' +
+              ' value="1"style="width:100px"> ' +
+              '</td><td><a href="javascript:;" id="delete"><i style="font-size: 20px;" class="fas fa-times-circle"></i></a></td></tr>'
+          );
+        });
+        $('#order').on('click', '#delete', function () {
+          $(this).closest('tr').remove();
+        });
+
+        // $('#tim').on('keyup', function () {
+        //   var value = $(this).val().toLowerCase();
+        //   $('#dssp tr').filter(function () {
+        //     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        //   });
+        // });
+
+        $('#send').click(() => {
+          var arr = [];
+          $('#order tr').each(function (a, b) {
+            var name = $('#tenor', b).text();
+            var sl = $('#sl', b).val();
+            var id_sp = $('#id2',b).val();
+            arr.push({id:id_sp, sl: sl });
+          });
+         
+          if (arr.length == 0) {
+            return;
+          }
+          var getarr = new Map();
+          arr.forEach((e) => {
+            if (e.id){
+              if(getarr.get(e.id)){
+                getarr.set(e.id, Number(e.sl)+Number(getarr.get(e.id)));
+              }else {
+                getarr.set(e.id,e.sl);
+              }
+            }
+          });
+
+          
+          console.log(JSON.stringify({data : getarr}));
+          if(getarr.size!=0)
+          $('#output').text('Đang xử lý, Vui lòng chờ giây lát .....');
+          if(getarr.size!=0){
+            $.ajax({
+              url:'/dathang',
+              method : 'post',
+              contentType : 'application/json',
+              data: JSON.stringify({data : getarr}),
+              success : (res)=>{
+                $('#output').text(res);
+                setTimeout(() => {
+                   $('#output').text('');
+                   $('#order tbody>tr').remove();
+                }, 1000);
+
+              }
+            })
+          }
+
+          
+        });
+
+      });
+
+      $('#formsubmitexcel').on('submit',(e)=>{
+        let anh = $('#fileSelect').val();
+        let array = anh.split('\\');
+        let array2 = array[array.length-1].split('.');
+        let checkfinal = array2[array2.length-1];
+        if(checkfinal!='xlsx'){
+          alert('Chỉ nhận file xlsx !!!');
+          return false;
+        }else{
+          alert('File upload success !!!');
+          return true;
+        }
+      })
+
     </script>
   </body>
 </html>

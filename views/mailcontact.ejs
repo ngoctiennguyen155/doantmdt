@@ -167,6 +167,7 @@ The above copyright notice and this permission notice shall be included in all c
               <form class="navbar-form">
                 <div class="input-group no-border">
                   <input
+                  id="inputsearch"
                     type="text"
                     value=""
                     class="form-control"
@@ -268,7 +269,7 @@ The above copyright notice and this permission notice shall be included in all c
                             Gửi mail
                           </th>
                         </thead>
-                        <tbody>
+                        <tbody id="myTable">
                           <%var stt=0; mailcontact.forEach(e=>{stt++; %>
                           <tr>
                             <td>
@@ -822,5 +823,16 @@ The above copyright notice and this permission notice shall be included in all c
         });
       });
     </script>
+    <script>
+    $(document).ready(function(){
+    $("#inputsearch").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+  </script>
   </body>
 </html>

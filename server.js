@@ -513,8 +513,11 @@ app.post('/admin',async function (req, res) {
   if (validatehashpw) {
     if (user[0].chucvu == "admin") {
       zdadsfasdfa[1] = user[0].email;
+      console.log(user);
+      req.session.user = user[0];
       res.render('taikhoan', { dataac: dataac,user:user[0].email });
     } else if (user[0].chucvu == "nhanvien") {
+      req.session.user = user[0];
       res.render('thongke');
     } else {
       res.redirect('/admin');
@@ -544,7 +547,7 @@ app.get('/contact', function (req, res) {
 });
 
 app.get('/profile', function (req, res) {
-  res.render('profile');
+  res.render('profile',{user : req.session.user});
 });
 const contactmessage = require('./model/contact');
 app.post('/contact', async function (req, res) {
@@ -1087,4 +1090,20 @@ app.post('/updatesoluongsanpham',async (req, res) => {
     console.log('Uploadexcel success !!!');
   })
   res.redirect('/nhaphang');
+})
+app.put('/updateprofile', async (req, res) => {
+  const updateac = require('./model/accout');
+  await updateac.findByIdAndUpdate({ _id: new ObjectId(req.body.id) },
+    {
+      $set: {
+        tennv: req.body.tennv,
+        gioitinh: req.body.gioitinh,
+        email: req.body.email,
+        diachi: req.body.diachi,
+        thongtinkhac: req.body.thongtinkhac
+      }
+    }, { new: true });
+  let reloaduser =await updateac.findById({ _id: new ObjectId(req.body.id) });
+  req.session.user = reloaduser;
+  res.send('Update success...');
 })

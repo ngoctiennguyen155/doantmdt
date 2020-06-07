@@ -53,7 +53,7 @@ The above copyright notice and this permission notice shall be included in all c
 $(document).ready(function(){
   $("#tim").on("keyup", function() {
     var value = $(this).val().toLowerCase();
-    $("#searchdssp>tr>td").filter(function() {
+    $("#searchdssp tr").filter(function() {
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
@@ -286,6 +286,9 @@ $(document).ready(function(){
                             <thead class="text-primary">
                               <th>
                                 Tên sản phẩm
+                              </th>
+                              <th>
+                                
                               </th>
                             </thead>
                             <tbody id="searchdssp">

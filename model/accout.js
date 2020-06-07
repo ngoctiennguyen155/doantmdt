@@ -43,6 +43,9 @@ const acount = mongoose.Schema({
   ngaycapnhat: {
     type: Date,
   },
+  thongtinkhac: {
+    type: String,
+  },
   block: {
     type: Boolean,
     require:true

@@ -6,11 +6,9 @@ const mongodb = require('mongoose');
 const cors = require('cors');
 const csrf = require('csurf');
 const bcrypt = require('bcrypt');
-const excelToJson = require('convert-excel-to-json');
 var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
 const multer = require('multer');
-const utf8 = require('utf8');
 const nodemailer = require('nodemailer');
 require('dotenv/config');
 
@@ -18,6 +16,13 @@ var router = require('express').Router();
 var arr_qty =[];
 var arr_sl =[];
 const passport = require('passport');
+const fastcsv = require("fast-csv");
+const fs = require("fs");
+   
+ var today = new Date();
+ var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+'_time_'+today.getHours()+'-'+today.getMinutes()+'-'+today.getSeconds();
+ var  ws = fs.createWriteStream("checked_"+ date + ".csv");
+
 // connect mongodb
 mongodb.set('useCreateIndex', true);
 mongodb.set('useFindAndModify', false);
@@ -226,6 +231,21 @@ app.get('/shop-grid', async function (req, res, next) {
 app.get('/shoping-cart', function (req, res, next) {
   var cart = new Cart(req.session.cart || {});
   var coupon="";
+
+  // try {
+  //   fastcsv
+  //     .write(cart.genetateArr(), { headers: true })
+  //     .on("finish", function() {
+  //       console.log("Write to bezkoder_mongodb_fastcsv.csv successfully!");
+  //     })
+  //     .pipe(ws);
+  //   }
+  //   catch (error) {
+  //     console.log("xay ra loi");
+  // }
+
+
+
   if(req.session.coupon)
   {
     req.session.coupon=coupon;
@@ -441,13 +461,22 @@ app.get('/admin', function (req, res) {
   res.render('login');
 });
 
+
+
+const billcsv = require('./model/billcsv');
+var datat = [];
 app.get('/hoadon', async function (req, res,next) {
   const data = await bill.find({ });
+  datat=[];
   var from = "";
   var to = "";
-  data.forEach(bill => {
 
-  });
+
+ 
+  data.forEach(e=> {
+    var bill_obj = new  billcsv(e);
+    datat.push(bill_obj);      
+        })
   res.render('hoadon',{
     listbill: data,
     day_from: from,
@@ -455,23 +484,30 @@ app.get('/hoadon', async function (req, res,next) {
   });
 })
 
-
-
 app.post('/findbyday', async function (req, res,next) {
   const data = await bill.find({ });
+  datat=[];
   var data_find = [];
   var from  = req.body.from ; 
   var to =  req.body.to;
+
+
   var date_from = new Date(from);
   var date_to = new Date(to);
+
+  
   data.forEach(bill => {
    if(  date_from.getTime()<= bill.date.getTime()  && bill.date.getTime()<= date_to.getTime()+86400000 )
    {
-          
       data_find.push(bill);
 
    }
   });  
+  
+  data_find.forEach(e=> {
+    var bill_obj = new  billcsv(e);
+    datat.push(bill_obj);      
+        })
 
    res.render('hoadon',{
     listbill: data_find,
@@ -481,6 +517,23 @@ app.post('/findbyday', async function (req, res,next) {
 
 });
 
+
+app.post('/export_csv', async function (req, res,next) {
+
+
+
+  fastcsv
+    .write(datat, { headers: true })
+    .on("finish", function() {                                                                  
+      console.log("Write to bezkoder_mongodb_fastcsv.csv successfully!");
+    })
+    .pipe(ws);
+  
+ 
+
+
+res.redirect("/hoadon");
+})
 
 
 app.get('/coupon',async function (req, res) {
@@ -513,11 +566,8 @@ app.post('/admin',async function (req, res) {
   if (validatehashpw) {
     if (user[0].chucvu == "admin") {
       zdadsfasdfa[1] = user[0].email;
-      console.log(user);
-      req.session.user = user[0];
       res.render('taikhoan', { dataac: dataac,user:user[0].email });
     } else if (user[0].chucvu == "nhanvien") {
-      req.session.user = user[0];
       res.render('thongke');
     } else {
       res.redirect('/admin');
@@ -547,7 +597,7 @@ app.get('/contact', function (req, res) {
 });
 
 app.get('/profile', function (req, res) {
-  res.render('profile',{user : req.session.user});
+  res.render('profile');
 });
 const contactmessage = require('./model/contact');
 app.post('/contact', async function (req, res) {
@@ -634,15 +684,8 @@ app.get('/nhaphang',async (req, res) => {
   //console.log(gettableproduct);
   res.render('nhaphang',{data:gettableproduct});
 })
-app.get('/xacnhannhaphang', async (req, res) => {
-  const nhaphang = require('./model/phieunhap');
-  const dsn = await nhaphang.find({}).sort({ status: 1 });
-  console.log(dsn[0].dsnhap);
-  dsn[0].dsnhap.forEach(e => {
-    console.log(typeof e.tensp);
-    console.log(e.tensp.length);
-  })
-  res.render('xacnhannhaphang',{data : dsn});
+app.get('/xacnhannhaphang',(req, res) => {
+  res.render('xacnhannhaphang');
 })
 
 
@@ -939,171 +982,4 @@ app.put('/updatencc', async (req, res) => {
     { $set: { ncc: { tenncc: req.body.tenncc, gia: req.body.gia, sdt: req.body.sdt, email: req.body.email } } },
     { new: true });
   res.send('Update success ...');
-})
-app.put('/updatedonhang',async (req, res)=>{
-  const donhang = require('./model/phieunhap');
-  await donhang.findByIdAndUpdate({
-    _id : new ObjectId(req.body.id)
-  },
-    {
-      $set: { status: req.body.status }
-    }, {
-    new: true
-  });
-  res.send('Thực hiện thành công...');
-});
-app.post('/dathang',async (req, res) => {
-  const donhang = require('./model/phieunhap');
-  const objdonhang = {
-    dsnhap: [],
-    status: 0,
-    nguoilap: 'nv1',
-  }
-  const donhanglist = req.body.data;
-  for ([key, value] of donhanglist){
-    const gettensp = await allsp.findById({ _id: new ObjectId(key) });
-    let objecttensp =gettensp.tensp;
-    //console.log(objecttensp, objecttensp.length);
-    
-    objdonhang.dsnhap.push({
-      id : key,
-      tensp: objecttensp,
-      sl: value,
-      nguoikt: '',
-      trangthai:false,
-    })
-  }
-  
-  const newdonhang = new donhang(objdonhang);
-  console.log(newdonhang);
-  await newdonhang.save();
-  res.send('Đơn hàng đã được gửi đến quản lý !!!');
-})
-app.put('/capnhatdonhang',async (req, res) => {
-  const donhang = require('./model/phieunhap');
-  const getdonhang = await donhang.find({ "status": 1, "dsnhap.tensp" : req.body.tensp, "dsnhap.sl" : req.body.sl });
-  if (getdonhang.length == 0) {
-    res.send('Không tìm thấy đơn hàng !!!');
-  } else {
-    
-    await donhang.findOneAndUpdate(
-      {
-        'status': 1,
-        'dsnhap.tensp': req.body.tensp,
-        'dsnhap.sl': req.body.sl,
-      },
-      {
-        $set: {
-          'dsnhap.$.nguoikt': 'nv1',
-          'dsnhap.$.trangthai': true,
-        },
-      },
-      {
-        new: true,
-      }
-    );
-    res.send(getdonhang);
-    
-  }
-})
-app.post('/updatesoluongsanpham',async (req, res) => {
-  var storage2 = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './upload');
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-
-  var upload2 = multer({ storage: storage2 }).single('exel');
-  upload2(req, res,async function (err) {
-    // console.log(req.file);
-    const result = excelToJson({
-      sourceFile: './upload/'+req.file.filename,
-      sheets: [{
-        name: 'Sheet1',
-        header: {
-          rows: 1
-        },
-        columnToKey: {
-          B: 'tensp',
-          C: 'soluong'
-        }
-      }],
-    });
-    //console.log(result.Sheet1);
-    // update donhang, e là từng phiếu nhập
-    let arrayphieunhap = result.Sheet1;
-    const hoadon = require('./model/phieunhap');
-    arrayphieunhap.forEach(async(e) => {
-      console.log(e);
-      const getphieunhap = await hoadon.find({ status: 1,dsnhap:{$elemMatch :{tensp : e.tensp,sl:e.soluong,trangthai:false} } });
-      //console.log(getphieunhap);
-      if (getphieunhap.length == 0) {
-        console.log('Không thể cập nhật số lượng sản phẩm: ' + e.tensp);
-      } else {
-        let getdsnhapphieunhap = getphieunhap[0].dsnhap;
-        //console.log(getdsnhapphieunhap);
-        getdsnhapphieunhap.forEach(async(ee) => {
-          if (ee.tensp == e.tensp) {
-            await hoadon.findOneAndUpdate(
-              {
-                status: 1,
-                dsnhap: {
-                  $elemMatch: {
-                    tensp: e.tensp,
-                    sl: e.soluong,
-                    trangthai: false,
-                  },
-                },
-              },
-              {
-                $set: {
-                  'dsnhap.$.nguoikt': 'nv1',
-                  'dsnhap.$.trangthai': true,
-                },
-              },
-              {
-                new: true,
-              }
-            );
-            let getproductupdate = await allsp.find({ tensp: ee.tensp });
-            let getoldsl = Number(getproductupdate[0].sl);
-            let getidproductupdate = getproductupdate._id;
-            await allsp.findOneAndUpdate(
-              { tensp: ee.tensp },
-              { $set: { sl: getoldsl + e.soluong } },
-              { new: true }
-            );
-            console.log(e.tensp +' Update soluong success!!!');
-          }
-        })
-      }
-    })
-      //
-    if (err instanceof multer.MulterError) {
-      console.log('error multerupload excel');
-    } else if(err) {
-      console.log('error unknow when upload excel');
-    }
-    console.log('Uploadexcel success !!!');
-  })
-  res.redirect('/nhaphang');
-})
-app.put('/updateprofile', async (req, res) => {
-  const updateac = require('./model/accout');
-  await updateac.findByIdAndUpdate({ _id: new ObjectId(req.body.id) },
-    {
-      $set: {
-        tennv: req.body.tennv,
-        gioitinh: req.body.gioitinh,
-        email: req.body.email,
-        diachi: req.body.diachi,
-        thongtinkhac: req.body.thongtinkhac
-      }
-    }, { new: true });
-  let reloaduser =await updateac.findById({ _id: new ObjectId(req.body.id) });
-  req.session.user = reloaduser;
-  res.send('Update success...');
 })

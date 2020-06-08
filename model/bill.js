@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const bill = mongoose.Schema({
+     date: {
+          type: Date,
+          default : Date.now
+     },
     first_name: {
           type: String,
           required: true,
@@ -61,6 +65,7 @@ discount_percent: {
      min: 1,
      max:1000
  },
+
 
 bill: {
      type: Array,

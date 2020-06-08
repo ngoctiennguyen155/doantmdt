@@ -1051,6 +1051,12 @@ ol {
 	width: 1000px;
 }
 
+.admin_bill {
+	display: flex;
+	align-items: center;
+	width: 300px;
+}
+
 .breadcrumb__text h2 {
 	font-size: 46px;
 	color: #ffffff;
@@ -2207,6 +2213,19 @@ ol {
 	padding-top: 30px;
 }
 
+.admin__order {
+	width: 400px;
+	background: #f5f5f5;
+	padding: 30px;
+	padding-top: 30px;
+}
+
+.mar_bill{
+	width: 300px;
+	margin-left: 80px;
+	padding-left: 80px;
+}
+
 .checkout__order h4 {
 	color: #1c1c1c;
 	font-weight: 700;
@@ -2230,12 +2249,34 @@ ol {
 	margin-bottom: 10px;
 }
 
+.admin__order .checkout__order__products {
+	font-size: 18px;
+	color: #1c1c1c;
+	font-weight: 700;
+	margin-bottom: 10px;
+}
+
 .bill__order .checkout__order__products {
 	font-size: 18px;
 	color: #1c1c1c;
 	font-weight: 700;
 	margin-bottom: 10px;
 }
+
+.bill__order .checkout__order__products {
+	font-size: 18px;
+	color: #1c1c1c;
+	font-weight: 700;
+	margin-bottom: 10px;
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -2263,6 +2304,14 @@ ol {
 	list-style: none;
 }
 
+.admin__order ul li {
+	font-size: 16px;
+	color: #6f6f6f;
+	line-height: 40px;
+	list-style: none;
+	mar
+}
+
 .bill__order ul li {
 	font-size: 16px;
 	color: #6f6f6f;
@@ -2271,6 +2320,10 @@ ol {
 }
 
 .checkout__order ul li span {
+	font-weight: 700;
+	float: right;
+}
+.admin__order ul li span {
 	font-weight: 700;
 	float: right;
 }
@@ -2361,6 +2414,16 @@ ol {
 	width: 100%;
 	margin-top: 10px;
 }
+
+
+
+
+
+
+
+  
+
+
 
 
 /*---------------------
@@ -3559,4 +3622,5 @@ ol {
 	.blog__details__hero__text h2 {
 		font-size: 24px;
 	}
+
 }

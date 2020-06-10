@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css" />
     <link rel="stylesheet" href="css/slicknav.min.css" type="text/css" />
     <link rel="stylesheet" href="css/style.css" type="text/css" />
+    
   </head>
 
   <body>
@@ -43,7 +44,7 @@
         <ul>
           <!-- <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li> -->
           <li>
-            <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
+            <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span id="bag1"><%=session.totalQty%></span></a>
         </li>
       </ul>
       <div class="header__cart__price"></div>
@@ -167,7 +168,7 @@
               <ul>
                 <!-- <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li> -->
                 <li>
-                  <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span><%=session.totalQty%></span></a>
+                  <a href="/shoping-cart"><i class="fa fa-shopping-bag"></i> <span id="bag2"><%=session.totalQty%></span></a>
         </li>
       </ul>
       <div class="header__cart__price"></div>
@@ -206,12 +207,12 @@
     <section class="shoping-cart spad">
 
       <div class="container">
-        <form action="/checkout" method="POST">
+        <form  >
 
         <div class="row">
           <div class="col-lg-12">
             <div class="shoping__cart__table">
-              <table>
+              <table id="myTableId">
                 <thead>
                   <tr>
                     <th class="shoping__product">Products</th>
@@ -228,12 +229,19 @@
                       <!------------------------------------------------------- -->
                     <tr class="shoping_tr" name="<%=id%>">
                     <td class="shoping__cart__item"  field='updates_<%=e.item.tensp %>' name="item_<%=id%>">
+                      <input type="hidden" value="<%=e.item._id%>" id="getid" >
                       <img style="width: 100px;" src="images/<%=e.item.maloaisp%>/<%=e.item.fileanh%>" alt="" />
-                      <h5><%=e.item.tensp%><%if(e.item.phantram){%><label>&#160;( -<%=e.item.phantram%>%)</label><%}%></h5> 
+                      <h5><%=e.item.tensp%><%if(e.item.hieuluc==='con'){%><label>&#160;( -<%=e.item.phantram%>%)</label><%}%></h5> 
                     </td>
 
                     <td class="shoping__cart__price" >
-                      <div  class='price_updates_<%=e.item._id %>' name="price_<%=id%>"><%= e.item.gia-(e.item.gia*e.item.phantram/100) %> </div>
+                      <div  class='price_updates_<%=e.item._id %>' name="price_<%=id%>">
+                        <% if(e.item.hieuluc==='con'){%>
+                          <%=e.item.gia - (e.item.gia*e.item.phantram/100)%>
+                        <%}else {%>
+                          <%=e.item.gia%>
+                        <%}%>
+                      </div>
                     </td>
 
                     <td class="shoping__cart__quantity" >
@@ -249,7 +257,7 @@
                     </td>
 
                     <td class="shoping__cart__item__close">
-                      <span class="icon_close" ></span>
+                      <span class="icon_close" id="deletesp" ></span>
                     </td>
 
                   </tr>
@@ -279,11 +287,11 @@
             <div class="shoping__checkout">
               <h5>Cart Total</h5>
               <ul>
-                <li>Subtotal <span class="all_sub" name="total"><%=subtotal%> </span></li>
-                <li > Discount(%) <span  class="discount"><%=phantram%> </></li>
+                <li>Subtotal <span  class="all_sub" name="total"><%=subtotal%> </span></li>
+                <li > Discount(%) <span  class="discount">0</span></li>
                 <li>Total <span class="all_total"><%=subtotal - (subtotal*phantram/100)%> </span></li>
               </ul>
-              <button type="submit" class="site-btn">Check out</button>
+              <button id="subcheckout" type="button" class="site-btn">Check out</button>
               
             </div>
           </div>
@@ -292,10 +300,11 @@
           <div class="shoping__continue">
             <div class="shoping__discount">
               <h5>Discount Codes</h5>
-              <form action="/add-coupon" method="POST">
-                <input type="text" name="coupon" placeholder="Enter your coupon code" value="<%=coupon_code%>"  />
-                <button type="submit" class="site-btn">APPLY COUPON</button>
+              <form>
+                <input id="inputcoupon" type="text" name="coupon" placeholder="Enter your coupon code" value=""  />
+                <button id="subcoupon" type="button" class="site-btn">APPLY COUPON</button>
               </form>
+              <p id="errorcoupon" style="color: red;"></p>
             </div>
           </div>
         </div> 
@@ -332,59 +341,160 @@ jQuery(document).ready(function(){
 //     var element = document.getElementById(elementId);
 //     element.parentNode.removeChild(element);
 // }
+function deletesp(idd,cb){
+    $.ajax({
+           url : '/apisession',
+           method:'POST',
+           contentType:"application/json",
+           data : JSON.stringify({id:idd}),
+           success : (res)=>{
+             cb(res);
+           }
+        })
+  }
+
 $('.icon_close').click(function(e){
   
   e.preventDefault();
+  var rowEl =  $(this).closest('tr');
+  var id = rowEl.find('#getid').val();
+  deletesp(id,ressession=>{
+    $('.all_total').text(ressession.totalPrice);
+    $('.all_sub').text(ressession.totalPrice);
+    $('#bag1').text(ressession.totalQty);
+    $('#bag2').text(ressession.totalQty);
+  })
   cartItem = $(this).parent().parent();
   cartItem.remove();
-  _total();
-  
-  
   
     });
 
+    function updatesoluong(id,sl,cb){
+          $.ajax({
+            url : '/updatesoluong',
+            method : 'POST',
+            contentType : 'application/json',
+            data : JSON.stringify({id:id,sl:sl}),
+            success : (res)=>{
+              cb(res);
+            }
+          })
+        }  
+
     $('.pro-qty').click(function(e){
         e.preventDefault();
-    
-  
+
         // Get the field name
         fieldName = $(this).attr('field');
+        let getid = fieldName.split('_');
         var qty = parseInt($('.qty_'+fieldName).val());
-        var price = parseFloat($('.price_'+fieldName).text());
+        updatesoluong(getid,qty,res=>{
+          console.log(res);
+          if(res.sl!=0){
+            alert('Limit '+res.sl+'!!!');
+            $('.qty_'+fieldName).val(res.sl);
+            $('.total_'+fieldName).text(parseFloat($('.price_'+fieldName).text())*res.sl);
+          }
+          ////////////////////////////////////////////////////////////////////////////////
+          $('.all_sub').text(res.sessioncart.totalPrice);
+          $('.all_total').text(res.sessioncart.totalPrice);
+        });
+        var price = parseFloat($('.price_'+fieldName).text());  
         var total = price*qty;
         $('.total_'+fieldName).text(total);
-        _total();
+        //_total();
     });
     $('.pro-qty input').change(function(e){
         e.preventDefault();
         fieldName = $(this).attr('field');
         var qty = parseInt($('.qty_'+fieldName).val());
+        let getidsp = fieldName.split('_');
+        updatesoluong(getidsp,qty,res=>{
+          console.log(res);
+           if(res.sl!=0){
+            alert('Limit '+res.sl+'!!!');
+            $('.qty_'+fieldName).val(res.sl);
+            $('.total_'+fieldName).text(parseFloat($('.price_'+fieldName).text())*res.sl);
+          }
+          ////////////////////////////////////////////////////////////////////////////////
+          $('.all_sub').text(res.sessioncart.totalPrice);
+          $('.all_total').text(res.sessioncart.totalPrice);
+        });
          var price = parseFloat($('.price_'+fieldName).text());
          var total = price*qty;
         $('.total_'+fieldName).text(total);
-        _total();
+        //_total();
     });
 
 
 
-function _total(){
-  $('.shoping_tr').each(function (){
-    qty_item++;
-});
+// function _total(){
+//   $('.shoping_tr').each(function (){
+//     qty_item++;
+// });
 
-    price_total = 0;
-    for (let i = 1; i<=qty_item; i++) {
-    price_total+=parseFloat($('#'+i).text());
-    }
-    $('.all_sub').text(price_total);
-    discount=parseInt($('.discount').text());
-    total_after_discount=price_total * ((100-discount)/100);
-    $('.all_total').text( total_after_discount);
-    qty_item=0;
+//     price_total = 0;
+//     for (let i = 1; i<=qty_item; i++) {
+//     price_total+=parseFloat($('#'+i).text());
+//     }
+//     $('.all_sub').text(price_total);
+//     discount=parseInt($('.discount').text());
+//     total_after_discount=price_total * ((100-discount)/100);
+//     $('.all_total').text( total_after_discount);
+//     qty_item=0;
 
-}
+// }
+
+$('#subcoupon').click(()=>{
+  let getcoupon = $('#inputcoupon').val();
+   
+  function checkcoupon (id,cb){
+    $.ajax({
+      url : '/checkcoupon',
+      method : 'POST',
+      contentType : 'application/json',
+      data : JSON.stringify({id:id}),
+      success : (res)=>{
+        cb(res);
+      }
+    })
+  }
+  if(getcoupon.length!=0){
+    let getcheckcoupon = checkcoupon(getcoupon,cb=>{
+      if(cb.phantram!=0){
+        $('#inputcoupon').val('');
+        $('.discount').text(cb.phantram);
+        let gt = $('.all_total').text();
+       
+        let gg =(100-Number(cb.phantram)) * Number(gt) /100;
+        $('.all_total').text(gg);
+      }
+    })
+  }
+})
+      
+$('#subcheckout').click((e)=>{
+  e.preventDefault();
+
+  let gett = $('.all_total').text();
+  let getcoupon = $('.discount').text();
+  if(Number(gett)!=0){
+    window.location.href='http://localhost:3000/checkout';
+    $.ajax({
+      url : '/regetcoupon',
+      method : 'PUT',
+      contentType: 'application/json',
+      data : JSON.stringify({phantram:getcoupon}),
+      success : res=>{
+
+      } 
+    })
+  }else {
+    alert('Your cart is null !!!');
+  }
+})
     
-  });
+});
 
     </script>
 </html>

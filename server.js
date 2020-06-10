@@ -10,8 +10,16 @@ var cookieParser = require('cookie-parser');
 const csrfProctection = csrf({ cookie: true });
 const multer = require('multer');
 const nodemailer = require('nodemailer');
+const request = require('request');
+const paypal = require('paypal-rest-sdk');
 require('dotenv/config');
-
+var convertousd=0;
+request('https://free.currconv.com/api/v7/convert?q=VND_USD&compact=ultra&apiKey=925acffac404d631739e',function (error, response, body) { 
+  //console.log(JSON.parse(body).VND_USD * 23000);
+  convertousd = JSON.parse(body).VND_USD;
+  console.log(convertousd);
+  }
+);
 var router = require('express').Router();
 var arr_qty =[];
 var arr_sl =[];
@@ -229,53 +237,30 @@ app.get('/shop-grid', async function (req, res, next) {
 // });
 
 app.get('/shoping-cart', function (req, res, next) {
-  var cart = new Cart(req.session.cart || {});
-  var coupon="";
-
-  // try {
-  //   fastcsv
-  //     .write(cart.genetateArr(), { headers: true })
-  //     .on("finish", function() {
-  //       console.log("Write to bezkoder_mongodb_fastcsv.csv successfully!");
-  //     })
-  //     .pipe(ws);
-  //   }
-  //   catch (error) {
-  //     console.log("xay ra loi");
-  // }
-
-
-
-  if(req.session.coupon)
-  {
-    req.session.coupon=coupon;
-  }
+  var cart = new Cart(req.session.cart || cartnull);
 
   res.render('shoping-cart', {
     session: req.session.cart || cartnull,
     getcart: cart.genetateArr() || [],
     subtotal: cart.totalPrice || 0,
-    coupon_code:coupon,
     phantram: 0,
   });
 });
 
-var giasell;
-app.get('/add-to-cart', function (req, res) {
+app.get('/add-to-cart', async function (req, res) {
+  var giasell;
   var id = req.query.id;
   var sl = req.query.sl;
-  var cart = new Cart(req.session.cart ? req.session.cart : {});
-  allsp.findById(new ObjectId(id), function (err, product) {
-    if (err) {
-      return res.redirect('/');
-    }
-    if (product.hieuluc === 'con')
-      giasell = product.gia - (product.gia * product.phantram) / 100;
+  var cart = new Cart(req.session.cart ? req.session.cart : cartnull);
+  const product = await allsp.findById({ _id: new ObjectId(id) });
+    
+  if (product.hieuluc == 'con')
+    giasell = product.gia - (product.gia * product.phantram) / 100;
     else giasell = product.gia;
+  console.log(product.hieuluc);
     cart.add(product, product._id, sl, giasell);
     req.session.cart = cart;
     res.redirect('/');
-  });
 });
 
 //route shop details
@@ -305,76 +290,134 @@ app.get('/blog', function (req, res) {
 });
 //route check out
 app.get('/checkout', function (req, res) {
-  res.render('checkout', { session: req.session.cart || cartnull });
-});
-app.post('/checkout', async function (req, res, next) {
-  var phantram;
-  const mac = req.session.coupon;
-  const newcoupon = await coupon.find({ ma: mac });
-  if(!newcoupon[0]){phantram=0;}
-  else{phantram=newcoupon[0].phantram} 
-var cart = new Cart(req.session.cart || {});
-var totalQty=0;
-arr_qty=[];
-// if(!req.body.y)
-// {
-req.body.y.forEach(e=>{ 
-  arr_qty.push(e);
-  totalQty++;
- });
-
- arr_id=[];
- for(var e in req.session.cart.items)
- {
-   arr_id.push(e);
- }
-
-//  for(var e in arr_id)
-//  { var sl_mua=arr_qty[e];
-//   if(!check_sl(arr_id[e], sl_mua))
-//   {
-    
-
-//     return res.redirect('shoping-cart');
-//     break;
-//   }
-// }
- 
- var arr_pro =  [];
- arr_pro = cart.genetateArr();
-cart.totalPrice=0;
-cart.totalQty=totalQty;
-for (var i in arr_pro) {
-  if(!arr_qty[i])
-  {
-    cart.remove(arr_id[i]);
-  }
-  else
-  {cart.update( arr_pro[i].item,arr_id[i],arr_qty[i],giasell);}
-}
-req.session.cart = cart;
+  
+  let getct = new Cart(req.session.cart);
   res.render('checkout', {
-    arr_qty: arr_qty,
-    session: req.session.cart || cartnull,
-    getcart: cart.genetateArr() || [],
-    subtotal: cart.totalPrice || 0,
-    phantram: phantram,
+    coupon : req.session.coupon||0,
+    session: getct,
+    getcart: getct.genetateArr() || [],
   });
 });
+app.post('/buy', (req, res) => {
 
-// function check_sl(id , sl){
-//   allsp.findById(new ObjectId(id), function (err, product) {
-//     console.log("so luong kiem tra");
-//     console.log( product.sl);
-//     console.log("so luong mua");
-//     console.log( sl);
-//     if(sl>product.sl)
-//     {
-//       console.log("vuot qua so luong kho");
-//       return false;
-//     }
-//   });
+  paypal.configure({
+    mode: 'sandbox', // Sandbox or live
+    client_id:
+      'AbRnw6VYbjNYXz0lpXGs6rLi96qBRV9cAi7tC1kGC6b7O9lqgOVPx9Vpq-Bqwi3-N8QzjRnKazrxvLIS',
+    client_secret:
+      'ENh8p4FKF7SK3v24Tffd9LScPj4g0Us6PoXq0qUq_7DTt2paRIX7iDHn00qIuJKPeXqU-jLsto7fBSTT',
+  });
+    let getct = new Cart(req.session.cart);
+    let productcart = getct.genetateArr();
+  const billproducts = [{
+    "name": "abc",
+    "sku": "1",
+    "price": 10,
+    "currency": "USD",
+    "quality": 1
+  }];
+  const tt = 1023.983;
+  const am = { "currency": "USD", "total": tt.toFixed(2) };
+  const create_payment_json = {
+    "intent": "sale",
+    "payer": { payment_method: "paypal" },
+    "redirect_urls": {
+      "return_url": "http://localhost:3000/success",
+      "cancel_url": "http://localhost:3000/cancel"
+    },
+    "transactions": [{
+      "item_list": { "items": billproducts },
+      "amount": am,
+      "description": "sdafasdfasdfasdfa"
+    }]
+  };
+
+    paypal.payment.create(create_payment_json, function (error, payment) {
+      if (error) {
+        console.warn(error);
+      } else {
+        console.log('Create Payment Response');
+        console.log(payment);
+        payment.links.forEach(link => {
+          if (link.rel === 'approval_url') return res.redirect(link.href);
+        })
+      }
+    });
+})
+app.get('/success', (req, res) => {
+  res.send({ success: 'success' });
+});
+app.get('/cancel', (req, res) => {
+  res.send({ cancel: 'cancel' });
+});
+// app.post('/checkout', async function (req, res, next) {
+//   var phantram;
+//   const mac = req.session.coupon;
+//   const newcoupon = await coupon.find({ ma: mac });
+//   if(!newcoupon[0]){phantram=0;}
+//   else{phantram=newcoupon[0].phantram} 
+// var cart = new Cart(req.session.cart || {});
+// var totalQty=0;
+// arr_qty=[];
+// // if(!req.body.y)
+// // {
+// req.body.y.forEach(e=>{ 
+//   arr_qty.push(e);
+//   totalQty++;
+//  });
+
+//  arr_id=[];
+//  for(var e in req.session.cart.items)
+//  {
+//    arr_id.push(e);
+//  }
+
+// //  for(var e in arr_id)
+// //  { var sl_mua=arr_qty[e];
+// //   if(!check_sl(arr_id[e], sl_mua))
+// //   {
+    
+
+// //     return res.redirect('shoping-cart');
+// //     break;
+// //   }
+// // }
+ 
+//  var arr_pro =  [];
+//  arr_pro = cart.genetateArr();
+// cart.totalPrice=0;
+// cart.totalQty=totalQty;
+// for (var i in arr_pro) {
+//   if(!arr_qty[i])
+//   {
+//     cart.remove(arr_id[i]);
+//   }
+//   else
+//   {cart.update(arr_id[i],arr_qty[i],giasell);}
 // }
+// req.session.cart = cart;
+//   res.render('checkout', {
+//     arr_qty: arr_qty,
+//     session: req.session.cart || cartnull,
+//     getcart: cart.genetateArr() || [],
+//     subtotal: cart.totalPrice || 0,
+//     phantram: phantram,
+//   });
+// });
+
+// // function check_sl(id , sl){
+// //   allsp.findById(new ObjectId(id), function (err, product) {
+// //     console.log("so luong kiem tra");
+// //     console.log( product.sl);
+// //     console.log("so luong mua");
+// //     console.log( sl);
+// //     if(sl>product.sl)
+// //     {
+// //       console.log("vuot qua so luong kho");
+// //       return false;
+// //     }
+// //   });
+// // }
 
 
 
@@ -638,22 +681,31 @@ app.post('/validateemail', (req, res) => {
   });
 })
 //
-app.post('/add-coupon', async function (req, res) {
-  const mac = req.body.coupon;
-  req.session.coupon = mac;
-  const newcoupon = await coupon.find({ ma: mac });
-
-  var cart = new Cart(req.session.cart || {});
-
-  res.render('shoping-cart', {
-    session: req.session.cart || cartnull,
-    getcart: cart.genetateArr() || [],
-    subtotal: cart.totalPrice || 0,
-    coupon_code:mac,
-    phantram: newcoupon[0].phantram,
-  });
+app.post('/checkcoupon', async function (req, res) {
+  let getcoupon = await coupon.find({ ma: req.body.id ,trangthai:1});
+  let phantramcoupon = 0;
+  if (getcoupon.length == 1) {
+    phantramcoupon = getcoupon[0].phantram;
+    req.session.coupon = phantramcoupon;
+  }
+  res.send({ phantram: phantramcoupon });
 });
-
+app.post('/updatesoluong', async (req, res) => {
+  if (typeof req.body.sl === 'number') {
+    //console.log(req.body.sl);
+    let getallsl = await allsp.findById({ _id: new ObjectId(req.body.id[1]) });
+    if (Number(req.body.sl) >= 0 && Number(req.body.sl) <= Number(getallsl.sl)) {
+      //console.log(req.body.sl, getallsl.sl);
+      let nc = new Cart(req.session.cart);
+      let id_ = req.body.id[1];
+      nc.update(id_, req.body.sl);
+      req.session.cart = nc;
+      res.send({ sl: 0,sessioncart : req.session.cart});
+    } else if (Number(req.body.sl) > Number(getallsl.sl)) {
+      res.send({ sl: Number(getallsl.sl), sessioncart: req.session.cart });
+    } else res.send({ sl: 0,sessioncart : req.session.cart });
+  }else res.send({ sl: 0, sessioncart: req.session.cart });
+})
 // admin route
 app.get('/thongke', (req, res) => {
   res.render('thongke');
@@ -983,3 +1035,20 @@ app.put('/updatencc', async (req, res) => {
     { new: true });
   res.send('Update success ...');
 })
+
+app.post('/apisession', (req, res) => {
+  let id = req.body.id;
+  //console.log(id);
+  var crt = new Cart(req.session.cart);
+  crt.remove(id);
+  crt.totalQty--;
+  req.session.cart = crt;
+  res.send(req.session.cart);
+})
+
+app.put('/regetcoupon',(req, res)=> {
+  if (Number(req.body.phantram) != req.session.coupon) {
+    req.session.coupon = 0;
+  }
+})
+

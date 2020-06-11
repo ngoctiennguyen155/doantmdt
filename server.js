@@ -1054,5 +1054,6 @@ app.put('/regetcoupon',(req, res)=> {
   if (Number(req.body.phantram) != req.session.coupon) {
     req.session.coupon = 0;
   }
+  res.redirect('/checkout');
 })
 

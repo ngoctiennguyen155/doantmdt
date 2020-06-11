@@ -464,10 +464,12 @@ $('#subcoupon').click(()=>{
       if(cb.phantram!=0){
         $('#inputcoupon').val('');
         $('.discount').text(cb.phantram);
-        let gt = $('.all_total').text();
+        let gt = $('.all_sub').text();
        
         let gg =(100-Number(cb.phantram)) * Number(gt) /100;
         $('.all_total').text(gg);
+      }else{
+        $('#inputcoupon').val('');
       }
     })
   }
@@ -475,20 +477,25 @@ $('#subcoupon').click(()=>{
       
 $('#subcheckout').click((e)=>{
   e.preventDefault();
-
   let gett = $('.all_total').text();
   let getcoupon = $('.discount').text();
-  if(Number(gett)!=0){
-    window.location.href='http://localhost:3000/checkout';
+  function rsetcp(phantram){
     $.ajax({
       url : '/regetcoupon',
       method : 'PUT',
       contentType: 'application/json',
-      data : JSON.stringify({phantram:getcoupon}),
+      data : JSON.stringify({phantram:phantram}),
       success : res=>{
-
+      
       } 
-    })
+    });
+  }
+  if(Number(gett)!=0){
+    rsetcp(Number(getcoupon));
+    setTimeout(() => {
+      window.location.href='http://localhost:3000/checkout';  
+    }, 1000);
+    
   }else {
     alert('Your cart is null !!!');
   }

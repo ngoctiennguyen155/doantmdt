@@ -233,36 +233,41 @@
               <div class="row">
                 <div class="col-lg-6">
                   <div class="checkout__input">
-                    <p>Fist Name<span>*</span></p>
-                    <input type="text" />
+                    <p>First Name<span>*</span></p>
+                    <input id="fn" type="text" />
+                    <p id="efn" style="color: red;"></p>
                   </div>
                 </div>
                 <div class="col-lg-6">
                   <div class="checkout__input">
                     <p>Last Name<span>*</span></p>
-                    <input type="text" />
+                    <input id="ln" type="text" />
+                    <p id="eln" style="color: red;"></p>
                   </div>
                 </div>
               </div>
-              <div class="checkout__input">
+              <!-- <div class="checkout__input">
                 <p>Country<span>*</span></p>
                 <input type="text" />
-              </div>
+              </div> -->
               <div class="checkout__input">
                 <p>Address<span>*</span></p>
-                <input
+                <input id="ad"
                   type="text"
                   placeholder="Street Address"
                   class="checkout__input__add"
                 />
-                <input
+                <p id="ead" style="color: red;"></p>
+                <input id="ad1"
                   type="text"
                   placeholder="Apartment, suite, unite ect (optinal)"
                 />
+                <p id="ead1" style="color: red;"></p>
               </div>
               <div class="checkout__input">
                 <p>Town/City<span>*</span></p>
-                <input type="text" />
+                <input id="city" type="text" />
+                <p id="ecity" style="color: red;"></p>
               </div>
               <!-- <div class="checkout__input">
                                 <p>Country/State<span>*</span></p>
@@ -276,13 +281,15 @@
                 <div class="col-lg-6">
                   <div class="checkout__input">
                     <p>Phone<span>*</span></p>
-                    <input type="text" />
+                    <input id="phone" type="text" />
+                    <p id="ephone" style="color: red;"></p>
                   </div>
                 </div>
                 <div class="col-lg-6">
                   <div class="checkout__input">
                     <p>Email<span>*</span></p>
-                    <input type="text" />
+                    <input id="emailbill" type="text" />
+                    <p id="eemailbill" style="color: red;"></p>
                   </div>
                 </div>
               </div>
@@ -308,7 +315,7 @@
                             </div> -->
               <div class="checkout__input">
                 <p>Order notes<span>*</span></p>
-                <input
+                <input id="note"
                   type="text"
                   placeholder="Notes about your order, e.g. special notes for delivery."
                 />
@@ -397,6 +404,7 @@
             //console.log(value.VND_USD);
             vnd = parseFloat(vnd)*value.VND_USD;
         })
+        var flagpaypal=false;
         paypal
           .Buttons({
             createOrder: function (data, actions) {
@@ -418,16 +426,158 @@
               // This function captures the funds from the transaction.
               return actions.order.capture().then(function (details) {
                 // This function shows a transaction success message to your buyer.
+                flagpaypal=true;
                 alert(
                   'Transaction completed by ' + details.payer.name.given_name
                 );
+
               });
             },
           })
           .render('#paypal-button-container');
+
+
+
+
+          ////////////////////////////
+          $('#payment').click(() => {
+        let getcheck = $('#payment').is(':checked');
+        if (getcheck == true) {
+          $('#paypal-button-container').css('display', 'none');
+          $('#paypal').prop('checked', false);
+          $('.site-btn').prop('disabled', false);
+        } else {
+          $('.site-btn').prop('disabled', true);
+        }
+      });
+      $('#paypal').click(() => {
+        let getcheck = $('#paypal').is(':checked');
+        if (getcheck == true) {
+          $('#paypal-button-container').css('display', 'block');
+          $('#payment').prop('checked', false);
+          $('.site-btn').prop('disabled', false);
+        
+        } else {
+          $('#paypal-button-container').css('display', 'none');
+          $('.site-btn').prop('disabled', true);
+       
+        }
+      });
+      function checkemailbill(email,cb){
+        $.ajax({
+          url : '/validateemail',
+          method :'POST',
+          contentType : 'application/json',
+          data : JSON.stringify({email:email}),
+          success: res=>{
+            cb(res);
+          }
+        })
+      }
+      function checkin4(){
+        let getfn = $('#fn');
+        let getln = $('#ln');
+        let getad = $('#ad');
+        let getad1 = $('#ad1');
+        let getcity = $('#city');
+        let getphone = $('#phone');
+        let getemailbill = $('#emailbill');
+        let getnote = $('#note');
+        if(getfn.val().length==0){
+          getfn.focus();
+          $('#efn').text('Please valid your first name !!!');
+          return false;
+        }else {
+          $('#efn').text('');
+        }
+
+        if(getln.val().length==0){
+          getln.focus();
+          $('#eln').text('Please valid your last name !!!');
+          return false;
+        }else {
+          $('#eln').text('');
+        }
+
+        if(getad.val().length==0){
+          getad.focus();
+          $('#ead').text('Please valid your address !!!');
+          return false;
+        }else {
+          $('#ead').text('');
+        }
+
+        if(getad1.val().length==0){
+          getad1.focus();
+          $('#ead1').text('Please valid apartment !!!');
+          return false;
+        }else {
+          $('#ead1').text('');
+        }
+
+        if(getcity.val().length==0){
+          getcity.focus();
+          $('#ecity').text('Please valid your city !!!');
+          return false;
+        }else {
+          $('#ecity').text('');
+        }
+
+        if(getphone.val().length==0){
+          getphone.focus();
+          $('#ephone').text('Please valid your phone !!!');
+          return false;
+        }else {
+          $('#ephone').text('');
+        }
+        var flagemail = false;
+        if(getemailbill.val().length==0){
+          getemailbill.focus();
+          $('#eemailbill').text('Please valid your email!!!');
+          return false;
+        }else {
+          $('#eemailbill').text('');
+          checkemailbill(getemailbill.val(),cb=>{
+            if(cb==false){
+              $('#eemailbill').text('Email not exist !!!');
+              getemailbill.focus();
+              
+            }else{
+              $('#eemailbill').text('');
+              let getcheckpayment = $('#payment').is(':checked');
+              let getcheckpaypal = $('#paypal').is(':checked');
+              if(getcheckpayment){
+                alert('ok payment');
+                return;
+              }
+              if(getcheckpaypal==true && flagpaypal==true){
+                alert('ok paypal');
+                return;
+              }else {
+                alert('Vui lòng thanh toán trước bằng paypal\n Và điền thông tin giao hàng.');
+                return;
+              }
+            }
+          })
+        }
+        return true;
+      }
+
+      $('.site-btn').click((e) => {
+        e.preventDefault();
+        let getcheckpayment = $('#payment').is(':checked');
+        let getcheckpaypal = $('#paypal').is(':checked');
+        checkin4();
+      
+      });
       });
       //This function displays Smart Payment Buttons on your web page.
     </script>
+    <script>
+    $(document).ready(() => {
+      
+    });
+  </script>
   </body>
   <!-- <script>
     $(document).ready(function () {
@@ -458,30 +608,5 @@
       });
     });
   </script> -->
-  <script>
-    $(document).ready(() => {
-      $('#payment').click(() => {
-        let getcheck = $('#payment').is(':checked');
-        if (getcheck == true) {
-          $('#paypal-button-container').css('display', 'none');
-          $('#paypal').prop('checked', false);
-          $('.site-btn').prop('disabled', false);
-        } else {
-          $('.site-btn').prop('disabled', true);
-        }
-      });
-      $('#paypal').click(() => {
-        let getcheck = $('#paypal').is(':checked');
-        if (getcheck == true) {
-          $('#paypal-button-container').css('display', 'block');
-          $('#payment').prop('checked', false);
-          $('.site-btn').prop('disabled', false);
-        } else {
-          $('#paypal-button-container').css('display', 'none');
-          $('.site-btn').prop('disabled', true);
-        }
-      });
-      $('.site-btn').click((e) => {});
-    });
-  </script>
+  
 </html>

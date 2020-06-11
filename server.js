@@ -291,7 +291,7 @@ app.get('/blog', function (req, res) {
 //route check out
 app.get('/checkout', function (req, res) {
   
-  let getct = new Cart(req.session.cart);
+  let getct = new Cart(req.session.cart||cartnull);
   res.render('checkout', {
     coupon : req.session.coupon||0,
     session: getct,
@@ -702,6 +702,10 @@ app.post('/updatesoluong', async (req, res) => {
       req.session.cart = nc;
       res.send({ sl: 0,sessioncart : req.session.cart});
     } else if (Number(req.body.sl) > Number(getallsl.sl)) {
+      let nc = new Cart(req.session.cart);
+      let id_ = req.body.id[1];
+      nc.update(id_, getallsl.sl);
+      req.session.cart = nc;
       res.send({ sl: Number(getallsl.sl), sessioncart: req.session.cart });
     } else res.send({ sl: 0,sessioncart : req.session.cart });
   }else res.send({ sl: 0, sessioncart: req.session.cart });

@@ -711,9 +711,270 @@ app.post('/updatesoluong', async (req, res) => {
   }else res.send({ sl: 0, sessioncart: req.session.cart });
 })
 // admin route
+var product = [];
+var bill_count = [];
+var mail_count = [];
+var year_now = new Date();
+
 app.get('/thongke', (req, res) => {
-  res.render('thongke');
+
+var namhientai = year_now.getFullYear();
+var namtruoc  = namhientai-1;
+  for(var i=0 ; i<=12;i++)
+  {
+    product[i]=0;
+  }
+  
+   for(var i = 0 ; i <=12 ; i++ )
+   {
+     bill_count[i]=0;
+   }
+  
+   for(var i = 0 ; i <=12 ; i++ )
+   {
+     mail_count[i]=0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+   }
+  res.render('thongke',
+ {
+  bill:bill_count,
+  product:product,
+  mail:mail_count,
+  namhientai:namhientai,
+  namtruoc:namtruoc,
+ });
 })
+
+// app.post('/pie',async (req, res,next) => {
+//   var year = req.body.Courses;
+// var start = new Date(Number(year), 1, 1);
+// var end = new Date(Number(year), 12, 31);
+// if(namhientai==year_now.getFullYear())
+// {
+//   namtruoc= namhientai-1;
+// }  
+// else 
+// {
+//   namtruoc = year_now.getFullYear();
+// }
+// const data = await bill.find({date: {$gte: start, $lt: end}});
+
+// data.forEach(e => {
+//   var qty_bill=0;
+
+// e.
+
+ 
+//   res.render('Pie_Chart');
+// });
+// })
+
+
+app.post('/thongke', async function (req, res,next) {
+  var year1 = req.body.Courses;
+  var start = new Date(Number(year1), 1, 1);
+  var end = new Date(Number(year1), 12, 31);
+  if(year1==year_now.getFullYear())
+  {
+    var year2= Number(year1) -1;
+  }  
+  else 
+  {
+    var year2 = Number(year1) + 1;
+  }
+  
+  for(var i=0 ; i<=12;i++)
+  {
+    product[i]=0;
+  }
+  
+   for(var i = 0 ; i <=12 ; i++ )
+   {
+     bill_count[i]=0;
+   }
+  
+   for(var i = 0 ; i <=12 ; i++ )
+   {
+     mail_count[i]=0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+   }
+  
+  const data = await bill.find({date: {$gte: start, $lt: end}});
+  const data2 = await contactmessage.find({date: {$gte: start, $lt: end}});
+   
+    data.forEach(e => {
+      var qty_bill=0;
+  
+    switch(e.date.getMonth()+1) {
+      case 1:
+        e.bill.forEach(obj=>{
+          qty_bill+=Number(obj.qty);   
+          })
+          product[1]+=qty_bill ;
+        break;
+      case 2:
+        e.bill.forEach(obj=>{
+          qty_bill+=Number(obj.qty);
+          console.log(obj.qty);
+      
+          })
+          product[2]+=qty_bill ;
+        break;
+        case 3:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+            console.log(obj.qty);
+        
+            })
+          product[3]+=qty_bill ;
+        
+        break;
+        case 4:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+            console.log(obj.qty);
+        
+            })
+          product[4]+=qty_bill ;
+        
+        break;
+        case 5:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[5]+=qty_bill ;
+        
+        break;
+        case 6:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[6]+=qty_bill ;
+        
+        break;
+        case 7:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[7]+=qty_bill ;
+        
+        break;
+        case 8:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[8]+=qty_bill ;
+        
+        break;
+        case 9:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[9]+=qty_bill ;
+        
+        break;
+        case 10:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[10]+=qty_bill ;
+        
+        break;
+        case 11:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[11]+=qty_bill ;
+        
+        break;
+        case 12:
+          e.bill.forEach(obj=>{
+            qty_bill+=Number(obj.qty);
+          
+            })
+          product[12]+=qty_bill ;
+        
+        break;
+     
+    }
+  })
+  
+   load_data(data,bill_count);
+   load_data(data2,mail_count);
+  
+   res.render('thongke',
+ {
+  bill:bill_count,
+  product:product,
+  mail:mail_count,
+  namtruoc:year1,
+  namhientai:year2,
+ });
+    
+    
+  })
+  
+  
+  
+  function load_data(data,array)
+  {
+    data.forEach(e=>{
+     
+  
+      switch(e.date.getMonth()+1) {
+       case 1:
+         array[1]++;
+         break;
+       case 2:
+         array[2]++;     
+         break;
+         case 3:
+           array[3]++;      
+         break;
+         case 4:
+           array[4]++;      
+         break;
+         case 5:
+           array[5]++;     
+         break;
+         case 6:
+           array[6]++;
+         
+         break;
+         case 7:
+           array[7]++;
+         
+         break;
+         case 8:
+           array[8]++;
+         
+         break;
+         case 9:
+           array[9]++;
+         
+         break;
+         case 10:
+           array[10]++;
+         
+         break;
+         case 11:
+           array[11]++;
+         
+         break;
+         case 12:
+           array[12]++;
+         
+         break;
+      
+     }
+    })
+  }
+
 
 app.get('/mail',async (req, res) => {
   const mailschema = require('./model/mail');

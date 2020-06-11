@@ -14,6 +14,7 @@ const request = require('request');
 const paypal = require('paypal-rest-sdk');
 require('dotenv/config');
 var convertousd=0;
+var macoupon = '';
 request('https://free.currconv.com/api/v7/convert?q=VND_USD&compact=ultra&apiKey=925acffac404d631739e',function (error, response, body) { 
   //console.log(JSON.parse(body).VND_USD * 23000);
   convertousd = JSON.parse(body).VND_USD;
@@ -110,6 +111,16 @@ const dsspnoibat = require('./model/sanpham');
 const coupon = require('./model/coupon');
 const ObjectId = require('mongodb').ObjectID;
 
+app.post('/checkcoupon', async function (req, res) {
+  macoupon = req.body.id;
+  let getcoupon = await coupon.find({ ma: req.body.id, trangthai: 1 });
+  let phantramcoupon = 0;
+  if (getcoupon.length == 1) {
+    phantramcoupon = getcoupon[0].phantram;
+    req.session.coupon = phantramcoupon;
+  }
+  res.send({ phantram: phantramcoupon });
+});
 app.get('/', async (req, res) => {
   const data = await dssanpham.find({
     trangthai: 'con',
@@ -611,7 +622,7 @@ app.post('/admin',async function (req, res) {
       zdadsfasdfa[1] = user[0].email;
       res.render('taikhoan', { dataac: dataac,user:user[0].email });
     } else if (user[0].chucvu == "nhanvien") {
-      res.render('thongke');
+      res.redirect('/thongke');
     } else {
       res.redirect('/admin');
     }
@@ -681,15 +692,7 @@ app.post('/validateemail', (req, res) => {
   });
 })
 //
-app.post('/checkcoupon', async function (req, res) {
-  let getcoupon = await coupon.find({ ma: req.body.id ,trangthai:1});
-  let phantramcoupon = 0;
-  if (getcoupon.length == 1) {
-    phantramcoupon = getcoupon[0].phantram;
-    req.session.coupon = phantramcoupon;
-  }
-  res.send({ phantram: phantramcoupon });
-});
+
 app.post('/updatesoluong', async (req, res) => {
   if (typeof req.body.sl === 'number') {
     //console.log(req.body.sl);
@@ -1001,8 +1004,10 @@ app.get('/nhaphang',async (req, res) => {
   //console.log(gettableproduct);
   res.render('nhaphang',{data:gettableproduct});
 })
-app.get('/xacnhannhaphang',(req, res) => {
-  res.render('xacnhannhaphang');
+app.get('/xacnhannhaphang',async(req, res) => {
+  const getallphieunhap = require('./model/phieunhap');
+  const allphieunhap = await getallphieunhap.find({});
+  res.render('xacnhannhaphang',{data:allphieunhap});
 })
 
 

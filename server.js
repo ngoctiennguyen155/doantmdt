@@ -14,7 +14,7 @@ const request = require('request');
 const paypal = require('paypal-rest-sdk');
 require('dotenv/config');
 var convertousd=0;
-var macoupon = '';
+var macoupon = 'no';
 request('https://free.currconv.com/api/v7/convert?q=VND_USD&compact=ultra&apiKey=925acffac404d631739e',function (error, response, body) { 
   //console.log(JSON.parse(body).VND_USD * 23000);
   convertousd = JSON.parse(body).VND_USD;
@@ -132,11 +132,12 @@ app.get('/', async (req, res) => {
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
+  var cart = new Cart(req.session.cart || cartnull);
   res.render('index', {
     listsp: data,
     listspnoibat: data2,
     message: '',
-    session: req.session.cart || cartnull,
+    session: cart,
   });
   //console.log(session.cart);
 });
@@ -152,11 +153,12 @@ app.get('/index', async (req, res) => {
     noibat: true,
     sl: { $regex: /[^0]/, $options: 'm' },
   });
+  var cart = new Cart(req.session.cart || cartnull);
   res.render('index', {
     listsp: data,
     listspnoibat: data2,
     message: '',
-    session: req.session.cart || cartnull,
+    session: cart,
   });
 });
 
@@ -433,44 +435,42 @@ app.get('/cancel', (req, res) => {
 
 
 app.post('/bill', async function (req, res, next) {
-var cart = new Cart(req.session.cart || {});
-var sll=0;
-var phantram;
-  var mac ;
-  mac=req.session.coupon;
-  if(!mac)
-  {
-    mac="no";
+  console.log(req.body);
+  var cart = new Cart(req.session.cart || {});
+  var phantram;
+  const newcoupon = await coupon.find({ ma: macoupon });
+  if (!newcoupon[0]) {
+    phantram = 0;
   }
-  const newcoupon = await coupon.find({ ma: mac });
-  if(!newcoupon[0]){phantram=0;}
-  else{phantram=newcoupon[0].phantram} 
-
-var mang_cart =[];
-
-var total_payment=cart.totalPrice*(100-phantram)/100;
-
-
-mang_cart= cart.genetateArr();
-for (var i in arr_id) {
-  var id = arr_id[i];
-find_id(id ,i);
-}
-  const bill_order = new bill({
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    street_address: req.body.street_address,
-    apartment_address:req.body.apartment_address,
-    phone: req.body.phone,
-    email: req.body.email,
-    coupon: mac,
-    discount_percent : phantram,
-    total_order_value: cart.totalPrice,
-    total_payment:  total_payment,
-    bill:mang_cart,
-  });
-  bill_order.save();
-  res.redirect('/bill');
+  else {
+    phantram = newcoupon[0].phantram;
+    coupon.findOneAndUpdate({ ma: macoupon }, { $set: { trangthai: 2 } }, { new: true });
+  } 
+  var mang_cart =[];
+  var total_payment=cart.totalPrice*(100-Number(phantram))/100;
+  mang_cart = cart.genetateArr();
+  
+    const bill_order = new bill({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      street_address: req.body.street_address,
+      apartment_address:req.body.apartment_address,
+      phone: req.body.phone,
+      email: req.body.email,
+      note: req.body.note,
+      coupon: macoupon,
+      discount_percent : phantram,
+      total_order_value: cart.totalPrice,
+      total_payment:  total_payment,
+      bill:mang_cart,
+    });
+  if (req.body.type == 'paypal') {
+    bill_order.save();
+    cart.deleteall();
+    req.session.cart = cart;
+    res.send({ data: '/', textStatus: 200 });
+  }
+    
 });
 
 function find_id(id ,i)
@@ -1319,6 +1319,7 @@ app.post('/apisession', (req, res) => {
 app.put('/regetcoupon',(req, res)=> {
   if (Number(req.body.phantram) != req.session.coupon) {
     req.session.coupon = 0;
+    macoupon = 'no';
   }
   res.redirect('/checkout');
 })

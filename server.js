@@ -617,6 +617,10 @@ app.get('/hoadon', async function (req, res,next) {
     var bill_obj = new  billcsv(e);
     datat.push(bill_obj);      
         })
+        // array data 
+  console.log(data[0].bill[0]);
+  console.log(data[0].bill[0].price);
+
   res.render('hoadon',{
     listbill: data,
     day_from: from,

@@ -61,6 +61,18 @@ body {
   background-color: #fafafa;
 }
 
+.checkout__form h4 {
+	color: #1c1c1c;
+	font-weight: 700;
+	border-bottom: 1px solid #e1e1e1;
+	padding-bottom: 20px;
+	margin-bottom: 25px;
+}
+
+.checkout__form p {
+	column-rule: #b2b2b2;
+}
+
 .mx-10{ overflow: scroll; height: 400px}
 .scroll{ overflow: scroll}
 

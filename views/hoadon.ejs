@@ -7,13 +7,13 @@ Product Page: https://www.creative-tim.com/product/material-dashboard
 Copyright 2020 Creative Tim (https://www.creative-tim.com)
 Coded by Creative Tim
 
-=========================================================
+<link rel="stylesheet" href="css/style.css" type="text/css"> 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     
-      <link rel="stylesheet" href="css/style.css" type="text/css">
+      
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
@@ -221,7 +221,59 @@ The above copyright notice and this permission notice shall be included in all c
              
             </div>
          
-         
+         <div style="z-index: 99999;width: 50%;margin-left: 200px;" id="id01" class="w3-modal popup" >
+                    <div class="w3-modal-content">
+                      <div class="modal-content ">
+                        <div class="modal-header">
+                          <p>
+                          <h6 style="font-family: Cairo , sans-serif;"><img style="height: 40px;;"
+                              src="img/logo.png" /></h6>
+                          </p>
+                          <button onclick="document.getElementById('id01').style.display='none'" type="button"
+                            class="close" data-dismiss="modal" style="font-size: 20px;">
+                            &times;
+                          </button>
+
+                        </div>
+                        <div class="modal-body text-primary">
+                          
+                          <% listbill.forEach(e=>{ var onebill=e.bill; var r =0; %>
+                             <table class="table" id="<%=e._id%>"hidden>
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Tên SP</th>
+                                    <th scope="col">Giá</th>
+                                     <th scope="col">Số lượng</th>
+                                    <th scope="col">Tổng tiền</th>
+                                   
+                                  </tr>
+                                </thead>
+                                <tbody >
+                                  <%onebill.forEach(i=>{r++;%>
+                                  <tr>
+                                    <th scope="row"><%=r%></th>
+                                    <td><%=i.item.tensp%></td>
+                                    
+                                   <td><%=i.price%></td>
+                                   <td><%=i.qty%></td>
+                                    <td><%=i.totalprice%></td>
+                                  </tr>
+                                  <%})%>
+                                </tbody>
+                              </table>
+                          <%})%>
+                          
+                        </div>
+                        <div class="modal-footer" >
+                          <button type="button" class="btn btn-default" id="btnmail" data-dismiss="modal"
+                            onclick="document.getElementById('id01').style.display='none'" style="margin: auto;">
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
           <div class="container-fluid">
             <div class="row">
               <div class="col-md-12">
@@ -265,12 +317,14 @@ The above copyright notice and this permission notice shall be included in all c
                             Order
                           </th>
                         </thead>
-                        <tbody>
-                          <% listbill.forEach(bill => { %>
+                        <tbody id="mytable">
+                          <% var run=0; listbill.forEach(bill => {run++; %>
 
                           <tr>
                             <td>
-                              <%=bill._id%>
+                              <%=run%>
+                             
+                              
                             </td>
                             <td>
                               <%=bill.last_name%>
@@ -296,23 +350,11 @@ The above copyright notice and this permission notice shall be included in all c
                             <td>
                               <%=bill.total_payment%>
                             </td>
-                           
-                      <td >
-                        <div class="checkout__form">
-                          
-                         
-                                    <div class="col-lg-4 col-md-6">
-                                      <div class="admin__order">
-                                         
-                                          <div class="checkout__order__products">Products List</div>
-                                         <% bill.bill.forEach(obj=>{  %>
-                                          <ul>
-                                            <li><%= obj.item.tensp%> <span><%=obj.totalprice%></span></li>
-                                           </ul>
-                                            <%})%>
-                                      </div>
-                                    </div>           
-                            </td>
+                           <td>
+                               <a href="javascript:;" id="chitiet" name="<%=bill._id%>">Xem chi tiết</a> 
+                               <input type="hidden" value="<%=bill._id%>"  id="getidbill">                               
+                           </td>
+                    
 
                           </tr>
                         <%})%>
@@ -394,7 +436,26 @@ The above copyright notice and this permission notice shall be included in all c
     ></script>
     <!-- Material Dashboard DEMO methods, don't include it in your project! -->
     <script src="../assets/demo/demo.js"></script>
-    
+    <script>
+      $(document).ready(function(){
+        $('table').on('click','#chitiet',function(){
+          var rowel = $(this).closest('tr');
+          var id = rowel.find('#getidbill').val();
+          $('#id01').css('display','block');
+          id='#'+id;
+          $(id).attr('hidden',false);
+          
+          $('#id01').css('display','block');
+          $('#btnmail').click(()=>{
+          $(id).attr('hidden',true);
+          })
+          $('.close').click(()=>{
+            $(id).attr('hidden',true);
+          })
+        })
+        
+      });
+    </script>
     
    
   </body>

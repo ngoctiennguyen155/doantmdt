@@ -43,7 +43,6 @@ const bill = mongoose.Schema({
   },
   note: {
     type: String,
-    required: true,
     min: 1,
     max: 10000,
   },

@@ -536,14 +536,18 @@
             return false;
           } else {
             $('#eemailbill').text('');
+            
             checkemailbill(getemailbill.val(), (cb) => {
+       
               if (cb == false) {
                 $('#eemailbill').text('Email not exist !!!');
+         
                 getemailbill.focus();
               } else {
-                $('#eemailbill').text('');
+               
                 let getcheckpayment = $('#payment').is(':checked');
                 let getcheckpaypal = $('#paypal').is(':checked');
+                
                 if (getcheckpayment) {
                   alert('Vui lòng check mail để xác thực đơn hàng ..');
                   $.ajax({
@@ -561,7 +565,7 @@
                       note: getnote.val()
                     }),
                     success: res=>{
-
+                      window.location.href='http://localhost:3000/';
                     }
                   });
                  // window.location.href='http://localhost:3000/index';
@@ -585,16 +589,10 @@
                     }),
                     success: function(data, textStatus) {
                       window.location.href='http://localhost:3000/';
-                  if (data.redirect) {
-            // data.redirect contains the string URL to redirect to
-            window.location.href = data.redirect;
-        } else {
-            // data.form contains the HTML for the replacement form
-            // $("#myform").replaceWith(data.form);
-        }
     }
                   })
                   //window.location.href='http://localhost:3000/index';
+                  $('#eemailbill').text('');
                   return;
                 } else {
                   alert('Vui lòng thanh toán trước bằng paypal !!!');
@@ -610,6 +608,7 @@
           e.preventDefault();
           let getcheckpayment = $('#payment').is(':checked');
           let getcheckpaypal = $('#paypal').is(':checked');
+          
           checkin4();
         });
       });

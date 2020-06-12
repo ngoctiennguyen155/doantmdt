@@ -12,9 +12,11 @@ const multer = require('multer');
 const nodemailer = require('nodemailer');
 const request = require('request');
 const paypal = require('paypal-rest-sdk');
+var Mailjet = require('node-mailjet').connect('89d3f83cddcb7a959c202b75773628b5', '75dc0201422c9ab354f4a2de606849fa');
 require('dotenv/config');
 var convertousd=0;
 var macoupon = 'no';
+
 request('https://free.currconv.com/api/v7/convert?q=VND_USD&compact=ultra&apiKey=925acffac404d631739e',function (error, response, body) { 
   //console.log(JSON.parse(body).VND_USD * 23000);
   convertousd = JSON.parse(body).VND_USD;
@@ -433,23 +435,35 @@ app.get('/cancel', (req, res) => {
 // // }
 
 
-
+var in4 = {};
+var globalcart;
 app.post('/bill', async function (req, res, next) {
   console.log(req.body);
   var cart = new Cart(req.session.cart || {});
+  globalcart = new Cart(req.session.cart);
   var phantram;
+  console.log(macoupon);
   const newcoupon = await coupon.find({ ma: macoupon });
+  console.log(newcoupon);
   if (!newcoupon[0]) {
     phantram = 0;
   }
   else {
     phantram = newcoupon[0].phantram;
-    coupon.findOneAndUpdate({ ma: macoupon }, { $set: { trangthai: 2 } }, { new: true });
+    await coupon.findOneAndUpdate({ ma: macoupon }, { $set: { trangthai: 2 } }, { new: true });
   } 
   var mang_cart =[];
   var total_payment=cart.totalPrice*(100-Number(phantram))/100;
   mang_cart = cart.genetateArr();
-  
+  in4 = {
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    street_address: req.body.street_address,
+    apartment_address: req.body.apartment_address,
+    phone: req.body.phone,
+    email: req.body.email,
+    note: req.body.note || ''
+  };
     const bill_order = new bill({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -457,7 +471,7 @@ app.post('/bill', async function (req, res, next) {
       apartment_address:req.body.apartment_address,
       phone: req.body.phone,
       email: req.body.email,
-      note: req.body.note,
+      note: req.body.note || '',
       coupon: macoupon,
       discount_percent : phantram,
       total_order_value: cart.totalPrice,
@@ -465,14 +479,86 @@ app.post('/bill', async function (req, res, next) {
       bill:mang_cart,
     });
   if (req.body.type == 'paypal') {
+    mang_cart.forEach(async e => {
+      let oldvalue = await allsp.findById({ _id: new ObjectId(e.item._id) });
+      let resetvalue = Number(oldvalue.sl) - Number(e.qty) +'';
+      await allsp.findByIdAndUpdate({ _id: new ObjectId(e.item._id) }, { $set: { sl: resetvalue } },{ new: true });
+    })
     bill_order.save();
+    cart.deleteall();
+    req.session.cart = cart;
+    req.session.coupon = 0;
+    res.send({ data: '/', textStatus: 200 });
+  } else if (req.body.type == 'payment') {
+    let htmlt = '<p>Nhấn vào đây để xác nhận đơn hàng: <a href="http://localhost:3000/xacthucdonhang">Đây</a> sau khi thực hiện đơn hàng sẽ được xử lý <p> <p>OGANI thank you !</p>';
+    
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env._EMAIL,
+        pass: process.env._PASSWORD,
+      },
+    });
+    var mailOptions = {
+      from: 'OGANI <' + process.env._EMAIL + '>',
+      to: req.body.email,
+      subject: 'Xác thực đơn hàng',
+      html: htmlt,
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
     cart.deleteall();
     req.session.cart = cart;
     res.send({ data: '/', textStatus: 200 });
   }
     
 });
-
+app.get('/xacthucdonhang',async (req, res) => {
+  var cart = globalcart;
+  var phantram;
+  console.log(macoupon);
+  const newcoupon = await coupon.find({ ma: macoupon });
+  console.log(newcoupon);
+  if (!newcoupon[0]) {
+    phantram = 0;
+  }
+  else {
+    phantram = newcoupon[0].phantram;
+    await coupon.findOneAndUpdate({ ma: macoupon }, { $set: { trangthai: 2 } }, { new: true });
+  } 
+  var mang_cart =[];
+  var total_payment=cart.totalPrice*(100-Number(phantram))/100;
+  mang_cart = cart.genetateArr();
+    const bill_order = new bill({
+      first_name: in4.first_name,
+      last_name: in4.last_name,
+      street_address: in4.street_address,
+      apartment_address:in4.apartment_address,
+      phone: in4.phone,
+      email: in4.email,
+      note: in4.note || '',
+      coupon: macoupon,
+      discount_percent : phantram,
+      total_order_value: cart.totalPrice,
+      total_payment:  total_payment,
+      bill:mang_cart,
+    });
+    mang_cart.forEach(async e => {
+      let oldvalue = await allsp.findById({ _id: new ObjectId(e.item._id) });
+      let resetvalue = Number(oldvalue.sl) - Number(e.qty) +'';
+      await allsp.findByIdAndUpdate({ _id: new ObjectId(e.item._id) }, { $set: { sl: resetvalue } },{ new: true });
+    })
+    bill_order.save();
+    cart.deleteall();
+    req.session.cart = cart;
+  res.redirect('/');
+  
+})
 function find_id(id ,i)
 {
   allsp.findById(new ObjectId(id), function (err, product) {
@@ -686,9 +772,11 @@ app.post('/mailsub',async (req, res) => {
 app.post('/validateemail', (req, res) => {
   var email = req.body.email;
   console.log(email);
+  console.log(email.length);
   const emailExistence = require('email-existence');
   emailExistence.check(email, function (error, response) {
     res.send(response);
+    console.log(response);
   });
 })
 //

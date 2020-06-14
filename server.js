@@ -1653,7 +1653,13 @@ app.put('/regetcoupon',(req, res)=> {
   res.redirect('/checkout');
 })
 
-app.get('/abc',async (req, res) => {
-  let t = await allsp.find({ tensp: 'tiễn abc' });
+app.post('/abc', async (req, res) => {
+  console.log(req.body);
+  let hangton = require('./model/tonkho');
+  let gethangton = await hangton.find({
+    ngayhethan: { $gte: new Date(req.body.date1), $lte: new Date(req.body.date2) },
+  }).sort({ngayhethan:1});
+  console.log(gethangton);
+  res.send(gethangton);
   
 })

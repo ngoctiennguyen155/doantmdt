@@ -200,6 +200,44 @@ The above copyright notice and this permission notice shall be included in all c
             <div class="row">
               <div class="col-md-12">
                 <div class="card">
+                  <div id="id01" class="w3-modal popup" style="z-index: 9999;width: 40%;margin-left: 100px;" >
+                    <div class="w3-modal-content">
+                      <div class="modal-content ">
+                        <div class="modal-header">
+                          <p>
+                          <h6 style="font-family: Cairo , sans-serif;"><img style="height: 40px;;"
+                              src="img/logo.png" /></h6>
+                          </p>
+                          <button onclick="document.getElementById('id01').style.display='none'" type="button"
+                            class="close" data-dismiss="modal" style="font-size: 20px;">
+                            &times;
+                          </button>
+
+                        </div>
+                        <div class="modal-body text-primary">
+                          <table class="table" id='tabletonkho'>
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Tên SP</th>
+                                    <th scope="col">Số lượng</th>
+                                     <th scope="col">Ngày hết hạn</th>
+                                  </tr>
+                                </thead>
+                                <tbody >
+                                  
+                                </tbody>
+                              </table>
+                        </div>
+                        <div class="modal-footer" >
+                          <button type="button" class="btn btn-default" id="btnmail" data-dismiss="modal"
+                            onclick="document.getElementById('id01').style.display='none'" style="margin: auto;">
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div class="card-header card-header-primary">
                     <h4 class="card-title">Bảng thống kê</h4>
                     <p class="card-category">Quản lí các thông số cơ bản</p>
@@ -290,7 +328,11 @@ The above copyright notice and this permission notice shall be included in all c
                     </div>
                     <div class="card-header card-header-primary">
                     <h4 class="card-title">Bảng sản phẩm tồn kho</h4>
-                    <p class="card-category"></p>
+                    <p class="card-category">
+                      Từ ngày : <input type="date" id="haohuttungay">
+                      Đến ngày : <input type="date" id="haohutdenngay">
+                      <input type="button" id="thongkehaohut" value="Thống kê">
+                    </p>
                   </div>
                     <div class="card-body">
                     <div class="table-responsive">
@@ -711,6 +753,53 @@ The above copyright notice and this permission notice shall be included in all c
         // Configuration options go here
         options: {},
       });
+    </script>
+    <script>
+      $(document).ready(function(){
+        function callbackdata(date1,date2,cb){
+          $.ajax({
+            url:'/abc',
+            method:'post',
+            contentType:'application/json',
+            data :JSON.stringify({date1:date1,date2:date2}),
+            success : res=>{
+              cb(res);
+            }
+          })
+        }
+        $('#thongkehaohut').click(function(){
+          let getngaybatdau = $('#haohuttungay').val();
+          let getketthuc = $('#haohutdenngay').val();
+          if(getngaybatdau.length==0){
+            alert('Vui lòng chọn ngày bắt đầu cụ thể !!!');
+            return;
+          }
+          if(getketthuc.length==0){
+            alert('Vui lòng chọn ngày kết thúc cụ thể !!!');
+            return;
+          }
+          callbackdata(getngaybatdau,getketthuc,cb=>{
+            if(cb.length!=0){
+              $('#id01').css('display','block');
+              $('#tabletonkho > tbody>tr').remove();
+              var stt=0;
+              cb.forEach(e=>{stt++;
+                 $('#tabletonkho > tbody:last-child').append(
+                   '<tr><td>'+stt+'</td>'+
+                   '<td>'+e.tensp+'</td>'+
+                   '<td>'+e.sl+'</td>'+
+                   '<td>'+e.ngayhethan+'</td></tr>'
+                   );
+              })
+             
+            }else{
+              alert(`Không có hao hụt trong khoảng ${getngaybatdau} tới ${getketthuc}`);
+            }
+          })
+          
+          //$('#id01').css('display','block');
+        })
+      })
     </script>
   </body>
 </html>

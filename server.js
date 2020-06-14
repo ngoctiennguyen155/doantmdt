@@ -445,7 +445,7 @@ function truhangton(id, value) {
         slcu = Number(result.sl) - Number(value) + '';
       }
       hangton
-        .findOneAndUpdate({ id: idd }, { $set: { sl: slcu } }, { new: true })
+        .findOneAndUpdate({ id: id }, { $set: { sl: slcu } }, { new: true })
         .then((abc) => {
           console.log(abc);
         });
@@ -881,9 +881,9 @@ var namtruoc  = namhientai-1;
   let hangton = require('./model/tonkho');
   let gethangton = await hangton.find({});
   gethangton.forEach(async e => {
-    if (e.ngayhethan < e.ngaynhap) {
+    if (e.ngayhethan < Date.now()) {
       await hangton.findOneAndUpdate({ id: e.id }, { $set: { trangthai: 1 } }, { new: true });
-    }else if(e.ngayhethan> e.ngaynhap){
+    }else if(e.ngayhethan> Date.now()){
       console.log('ok');
     }
   })
@@ -1063,9 +1063,9 @@ app.post('/thongke', async function (req, res,next) {
   let hangton = require('./model/tonkho');
   let gethangton = await hangton.find({});
    gethangton.forEach(async e => {
-    if (e.ngayhethan < e.ngaynhap) {
+    if (e.ngayhethan < Date.now()) {
       await hangton.findOneAndUpdate({ id: e.id }, { $set: { trangthai: 1 } }, { new: true });
-    }else if(e.ngayhethan> e.ngaynhap){
+    }else if(e.ngayhethan>Date.now()){
       console.log('ok');
     }
   })
@@ -1654,25 +1654,6 @@ app.put('/regetcoupon',(req, res)=> {
 })
 
 app.get('/abc',async (req, res) => {
-  let hangton = require('./model/tonkho');
-  let getallhangton =await hangton.find({});
-  console.log(getallhangton.length);
-  let ar = [];
-  getallhangton.forEach(async elem => {
-    let tam = await allsp.findById({ _id: new ObjectId(elem.id) });
-    console.log(tam);
-    ar.push({
-      id: elem.id,
-      tensp: tam.tensp,
-      hsd: tam.hsd,
-      ngaynhap: elem.ngaynhap,
-      ngayhethan:
-        tam.hsd.split(' ')[1] == 'month'
-          ? addDays(elem.ngaynhap,Number(tam.hsd.split(' ')[0]) * 30)
-          : addDays(elem.ngaynhap,Number(tam.hsd.split(' ')[0])),
-    });
-    console.log(ar);
-  })
-  console.log(ar);
-  res.send('ok');
+  let t = await allsp.find({ tensp: 'tiễn abc' });
+  
 })

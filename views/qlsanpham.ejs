@@ -218,7 +218,7 @@ The above copyright notice and this permission notice shall be included in all c
                               <input class="w60 mt5 ml5" id="gia" type="text" placeholder="Giá" name="gia"></br>
                               <input type="hidden" value="" id="_type">
                               <label class="mt5 w30" for="maloaisp" >Mã loại sp: </label>
-                              <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" name="maloaisp" >
+                              <select style="color: #666;" class="mt5 w60 ml5" id="maloaisp" name="maloaisp" disabled >
                                 <option value="">Chọn mã sp</option>
                                 <option value="thit">Thịt</option>
                                 <option value="raucu">Rau củ</option>
@@ -833,6 +833,7 @@ The above copyright notice and this permission notice shall be included in all c
       
       $('#themsanpham').click(() => {
         $('#id01').css("display", "block");
+        $('#maloaisp').prop('disabled',false);
         $('#btnsendfix').val('Tạo');
       })
          
@@ -1061,6 +1062,7 @@ The above copyright notice and this permission notice shall be included in all c
 
       $('table').on('click','#fixproduct',function(){
         $('#id01').css("display", "block");
+        $('#maloaisp').attr('disabled',true);
         var rowEl =  $(this).closest('tr');
         var id = rowEl.find('#getid').val();
         var ma = rowEl.find('#maproduct').text();

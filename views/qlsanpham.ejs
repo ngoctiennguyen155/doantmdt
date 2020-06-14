@@ -230,7 +230,7 @@ The above copyright notice and this permission notice shall be included in all c
                                 <option value="banhkeo">Bánh kẹo</option>
                               </select>
                                <label for="anh" class="w30 mt5"> Ảnh: </label>
-                              <input id="anh" class="mt5 ml5 w60 "  type="file"  name="anh" accept=".xlsx" >
+                              <input id="anh" class="mt5 ml5 w60 "  type="file"  name="anh" accept="image/*" >
                             </div>
                             <input type="hidden" value="" id="id_">
                             <input id="btnsendfix" type="submit"
@@ -331,7 +331,14 @@ The above copyright notice and this permission notice shall be included in all c
                             <%if(e.trangthai=="het" ){%>
                              <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Hết</a>
                             <%}else { if(Number(e.sl)<=10){%>
-                              <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >Còn</a>
+                              <a href="javascript:;" id="trangthai" style="background-color: red;color: white;border-radius: 5px;padding: 5px;" >
+                                <%if(Number(e.sl)==0){%>
+                                  Còn
+                                <%}else{%>
+                                  Hết
+                                <%} %>
+                                
+                              </a>
                               <%}else {%>
                                 <a href="javascript:;" id="trangthai">Còn</a>
                               <%}}%>

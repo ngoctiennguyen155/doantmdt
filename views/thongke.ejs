@@ -288,6 +288,50 @@ The above copyright notice and this permission notice shall be included in all c
                         </div>
                       </div>
                     </div>
+                    <div class="card-header card-header-primary">
+                    <h4 class="card-title">Bảng sản phẩm tồn kho</h4>
+                    <p class="card-category"></p>
+                  </div>
+                    <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead class="text-primary">
+                          <th>
+                            STT
+                          </th>
+                          <th>
+                            Tên sản phẩm
+                          </th>
+                          <th>
+                            Số lượng
+                          </th>
+                          <th>
+                            Ngày nhập
+                          </th>
+                          <th>
+                            Hạn sử dụng
+                          </th>
+                          <th>
+                            Ngày hết hạn
+                          </th>
+                        </thead>
+                        <tbody id="myTable">
+                          <%let l=0;hangton.forEach(e=>{l++;%>
+                            <tr>
+                              <td><%=l%></td>
+                              <td><%=e.tensp%></td>
+                              <td><%=e.sl%></td>
+                              
+                              <td><%=e.ngaynhap%></td>
+                              <td><%=e.hsd%></td>
+                              <td><%=e.ngayhethan%></td>
+                            </tr>
+                          <%})%>
+                          
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                   </div>
                   <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>< -->
                 </div>

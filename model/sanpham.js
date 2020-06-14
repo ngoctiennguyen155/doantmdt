@@ -73,6 +73,10 @@ const sanpham = mongoose.Schema({
     sdt: { type: String, require: true },
     email: { type: String, require: true },
   },
+  ngaynhap: {
+    type: Date,
+    default: new Date(),
+  },
 });
 sanpham.plugin(mongoosePaginate);
 module.exports = mongoose.model('sanphamm', sanpham);

@@ -7,9 +7,11 @@ const cors = require('cors');
 const csrf = require('csurf');
 const bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
+const excelToJson = require('convert-excel-to-json');
 const csrfProctection = csrf({ cookie: true });
 const multer = require('multer');
 const nodemailer = require('nodemailer');
+const addDays = require('add-days');
 const request = require('request');
 const paypal = require('paypal-rest-sdk');
 var Mailjet = require('node-mailjet').connect('89d3f83cddcb7a959c202b75773628b5', '75dc0201422c9ab354f4a2de606849fa');
@@ -434,7 +436,22 @@ app.get('/cancel', (req, res) => {
 // //   });
 // // }
 
-
+function truhangton(id, value) {
+  let hangton = require('./model/tonkho');
+  hangton.findOne({ id: id,trangthai:0 }).then((result) => {
+    if (result) {
+      let slcu = '0';
+      if (Number(result.sl) - Number(value) > 0) {
+        slcu = Number(result.sl) - Number(value) + '';
+      }
+      hangton
+        .findOneAndUpdate({ id: idd }, { $set: { sl: slcu } }, { new: true })
+        .then((abc) => {
+          console.log(abc);
+        });
+    }
+  });
+}
 var in4 = {};
 var globalcart;
 app.post('/bill', async function (req, res, next) {
@@ -481,8 +498,13 @@ app.post('/bill', async function (req, res, next) {
   if (req.body.type == 'paypal') {
     mang_cart.forEach(async e => {
       let oldvalue = await allsp.findById({ _id: new ObjectId(e.item._id) });
-      let resetvalue = Number(oldvalue.sl) - Number(e.qty) +'';
-      await allsp.findByIdAndUpdate({ _id: new ObjectId(e.item._id) }, { $set: { sl: resetvalue } },{ new: true });
+      truhangton(e.item._id, e.qty);
+      let resetvalue = Number(oldvalue.sl) - Number(e.qty) + '';
+      let objupdate = { sl: resetvalue };
+      if (Number(resetvalue) == 0) {
+        objupdate.trangthai = 'het';
+      }
+      await allsp.findByIdAndUpdate({ _id: new ObjectId(e.item._id) }, { $set: objupdate },{ new: true });
     })
     bill_order.save();
     cart.deleteall();
@@ -512,6 +534,10 @@ app.post('/bill', async function (req, res, next) {
         console.log('Email sent: ' + info.response);
       }
     });
+    //update trangthai when product =0 ;
+   
+    //
+
     cart.deleteall();
     req.session.cart = cart;
     res.send({ data: '/', textStatus: 200 });
@@ -550,9 +576,15 @@ app.get('/xacthucdonhang',async (req, res) => {
     });
     mang_cart.forEach(async e => {
       let oldvalue = await allsp.findById({ _id: new ObjectId(e.item._id) });
-      let resetvalue = Number(oldvalue.sl) - Number(e.qty) +'';
-      await allsp.findByIdAndUpdate({ _id: new ObjectId(e.item._id) }, { $set: { sl: resetvalue } },{ new: true });
+      truhangton(e.item._id, e.qty);
+      let resetvalue = Number(oldvalue.sl) - Number(e.qty) + '';
+      let objupdate = { sl: resetvalue };
+      if (Number(resetvalue) == 0) {
+        objupdate.trangthai = 'het';
+      }
+      await allsp.findByIdAndUpdate({ _id: new ObjectId(e.item._id) }, { $set: objupdate },{ new: true });
     })
+    
     bill_order.save();
     cart.deleteall();
     req.session.cart = cart;
@@ -569,11 +601,7 @@ function find_id(id ,i)
   });
 }
 
-function update (id , now)
-{
-  allsp.updateOne({_id:new ObjectId(id)}, {$set: { sl: now }}, {upsert: true}, function(err){
-  });
-}
+
 
 
 app.get('/bill', async function (req, res, next) {
@@ -687,7 +715,7 @@ app.get('/coupon',async function (req, res) {
 })
 
 app.get('/qlsanpham',async function (req, res) {
-  const spl = await allsp.find({}).sort({ sl: 1 });
+  const spl = await allsp.find({}).sort({ tensp: 1,trangthai: -1 });
   //console.log(spl);
   res.render('qlsanpham',{data:spl});
 });
@@ -710,8 +738,10 @@ app.post('/admin',async function (req, res) {
   if (validatehashpw) {
     if (user[0].chucvu == "admin") {
       zdadsfasdfa[1] = user[0].email;
+      req.session.user = user[0];
       res.render('taikhoan', { dataac: dataac,user:user[0].email });
     } else if (user[0].chucvu == "nhanvien") {
+      req.session.user = user[0];
       res.redirect('/thongke');
     } else {
       res.redirect('/admin');
@@ -741,9 +771,28 @@ app.get('/contact', function (req, res) {
 });
 
 app.get('/profile', function (req, res) {
-  res.render('profile');
+  res.render('profile',{user : req.session.user});
 });
+
+app.put('/updateprofile', async (req, res) => {
+  const updateac = require('./model/accout');
+  await updateac.findByIdAndUpdate({ _id: new ObjectId(req.body.id) },
+    {
+      $set: {
+        tennv: req.body.tennv,
+        gioitinh: req.body.gioitinh,
+        email: req.body.email,
+        diachi: req.body.diachi,
+        thongtinkhac: req.body.thongtinkhac
+      }
+    }, { new: true });
+  let reloaduser =await updateac.findById({ _id: new ObjectId(req.body.id) });
+  req.session.user = reloaduser;
+  res.send('Update success...');
+})
+
 const contactmessage = require('./model/contact');
+const phieunhap = require('./model/phieunhap');
 app.post('/contact', async function (req, res) {
   const newcontact = new contactmessage({
     name: req.body.name,
@@ -811,7 +860,7 @@ var bill_count = [];
 var mail_count = [];
 var year_now = new Date();
 
-app.get('/thongke', (req, res) => {
+app.get('/thongke',async (req, res) => {
 
 var namhientai = year_now.getFullYear();
 var namtruoc  = namhientai-1;
@@ -828,14 +877,24 @@ var namtruoc  = namhientai-1;
    for(var i = 0 ; i <=12 ; i++ )
    {
      mail_count[i]=0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-   }
+  }
+  let hangton = require('./model/tonkho');
+  let gethangton = await hangton.find({});
+  gethangton.forEach(async e => {
+    if (e.ngayhethan < e.ngaynhap) {
+      await hangton.findOneAndUpdate({ id: e.id }, { $set: { trangthai: 1 } }, { new: true });
+    }else if(e.ngayhethan> e.ngaynhap){
+      console.log('ok');
+    }
+  })
   res.render('thongke',
  {
   bill:bill_count,
   product:product,
   mail:mail_count,
   namhientai:namhientai,
-  namtruoc:namtruoc,
+  namtruoc: namtruoc,
+  hangton:gethangton
  });
 })
 
@@ -1001,7 +1060,15 @@ app.post('/thongke', async function (req, res,next) {
   
    load_data(data,bill_count);
    load_data(data2,mail_count);
-  
+  let hangton = require('./model/tonkho');
+  let gethangton = await hangton.find({});
+   gethangton.forEach(async e => {
+    if (e.ngayhethan < e.ngaynhap) {
+      await hangton.findOneAndUpdate({ id: e.id }, { $set: { trangthai: 1 } }, { new: true });
+    }else if(e.ngayhethan> e.ngaynhap){
+      console.log('ok');
+    }
+  })
    res.render('thongke',
  {
   bill:bill_count,
@@ -1009,6 +1076,7 @@ app.post('/thongke', async function (req, res,next) {
   mail:mail_count,
   namtruoc:year1,
   namhientai:year2,
+  hangton:gethangton
  });
     
     
@@ -1096,13 +1164,182 @@ app.get('/nhaphang',async (req, res) => {
   //console.log(gettableproduct);
   res.render('nhaphang',{data:gettableproduct});
 })
+app.post('/dathang', async (req, res) => {
+  const donhang = require('./model/phieunhap');
+  const objdonhang = {
+    dsnhap: [],
+    status: 0,
+    nguoilap: req.session.user.tennv || 'nv1',
+  };
+  const donhanglist = req.body.data;
+  for ([key, value] of donhanglist) {
+    const gettensp = await allsp.findById({ _id: new ObjectId(key) });
+    let objecttensp = gettensp.tensp;
+    //console.log(objecttensp, objecttensp.length);
+
+    objdonhang.dsnhap.push({
+      id: key,
+      tensp: objecttensp,
+      sl: value,
+      nguoikt: '',
+      trangthai: false,
+    });
+  }
+
+  const newdonhang = new donhang(objdonhang);
+  console.log(newdonhang);
+  await newdonhang.save();
+  res.send('Đơn hàng đã được gửi đến quản lý !!!');
+});
 app.get('/xacnhannhaphang',async(req, res) => {
   const getallphieunhap = require('./model/phieunhap');
-  const allphieunhap = await getallphieunhap.find({});
+  const allphieunhap = await getallphieunhap.find({}).sort({status:1});
   res.render('xacnhannhaphang',{data:allphieunhap});
 })
+app.put('/updatedonhang', async (req, res) => {
+  let phieunhap = require('./model/phieunhap');
+  console.log(req.body.id);
+  console.log(req.body.status);
+  await phieunhap.findByIdAndUpdate({ _id: new ObjectId(req.body.id) }, { $set: { status: Number(req.body.status) } }, { new: true });
+  res.send('Update success...');
+})
+app.put('/capnhatdonhang',async (req, res) => {
+  const donhang = require('./model/phieunhap');
+  const getdonhang = await donhang.find({ "status": 1, "dsnhap.tensp" : req.body.tensp, "dsnhap.sl" : req.body.sl });
+  if (getdonhang.length == 0) {
+    res.send('Không tìm thấy đơn hàng !!!');
+  } else {
 
+    await donhang.findOneAndUpdate(
+      {
+        'status': 1,
+        'dsnhap.tensp': req.body.tensp,
+        'dsnhap.sl': req.body.sl,
+      },
+      {
+        $set: {
+          'dsnhap.$.nguoikt': req.session.use.tennv || 'nv1',
+          'dsnhap.$.trangthai': true,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(getdonhang);
 
+  }
+})
+app.post('/updatesoluongsanpham',async (req, res) => {
+  var storage2 = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './upload');
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+
+  var upload2 = multer({ storage: storage2 }).single('exel');
+  upload2(req, res,async function (err) {
+    // console.log(req.file);
+    const result = excelToJson({
+      sourceFile: './upload/'+req.file.filename,
+      sheets: [{
+        name: 'Sheet1',
+        header: {
+          rows: 1
+        },
+        columnToKey: {
+          B: 'tensp',
+          C: 'soluong'
+        }
+      }],
+    });
+    //console.log(result.Sheet1);
+    // update donhang, e là từng phiếu nhập
+    let arrayphieunhap = result.Sheet1;
+    const hoadon = require('./model/phieunhap');
+    arrayphieunhap.forEach(async(e) => {
+      console.log(e);
+      const getphieunhap = await hoadon.find({ status: 1,dsnhap:{$elemMatch :{tensp : e.tensp,sl:e.soluong,trangthai:false} } });
+      //console.log(getphieunhap);
+      if (getphieunhap.length == 0) {
+        console.log('Không thể cập nhật số lượng sản phẩm: ' + e.tensp);
+      } else {
+        let getdsnhapphieunhap = getphieunhap[0].dsnhap;
+        //console.log(getdsnhapphieunhap);
+        getdsnhapphieunhap.forEach(async(ee) => {
+          if (ee.tensp == e.tensp) {
+            await hoadon.findOneAndUpdate(
+              {
+                status: 1,
+                dsnhap: {
+                  $elemMatch: {
+                    tensp: e.tensp,
+                    sl: e.soluong,
+                    trangthai: false,
+                  },
+                },
+              },
+              {
+                $set: {
+                  'dsnhap.$.nguoikt': req.session.user.tennv || 'nv1',
+                  'dsnhap.$.trangthai': true,
+                },
+              },
+              {
+                new: true,
+              }
+            );
+            let getproductupdate = await allsp.find({ tensp: ee.tensp });
+            let getoldsl = Number(getproductupdate[0].sl);
+            // if sl cũ còn thì add vào tồn kho
+            if (getoldsl > 0) {
+              let hangton = require('./model/tonkho');
+              let addhangton = new hangton({
+                id: getproductupdate[0]._id,
+                sl: getoldsl,
+                ngaynhap: getproductupdate[0].ngaynhap,
+                trangthai: 0,
+                tensp: getproductupdate[0].tensp,
+                hsd: getproductupdate[0].hsd,
+                ngayhethan:
+                  getproductupdate[0].hsd.split(' ')[1] == 'month'
+                    ? addDays(
+                        getproductupdate[0].ngaynhap,
+                        Number(getproductupdate[0].hsd.split(' ')[0]) * 30
+                      )
+                    : addDays(
+                        getproductupdate[0].ngaynhap,
+                        Number(getproductupdate[0].hsd.split(' ')[0])
+                      ),
+              });
+              await addhangton.save();
+            }  
+            //
+            let getidproductupdate = getproductupdate._id;
+            await allsp.findOneAndUpdate(
+              { tensp: ee.tensp },
+              { $set: { sl: getoldsl + e.soluong,ngaynhap: Date.now() } },
+              { new: true }
+            );
+            
+            console.log(e.tensp +' Update soluong success!!!');
+          }
+        })
+      }
+    })
+      //
+    if (err instanceof multer.MulterError) {
+      console.log('error multerupload excel');
+    } else if(err) {
+      console.log('error unknow when upload excel');
+    }
+    console.log('Uploadexcel success !!!');
+  })
+  res.redirect('/nhaphang');
+}) 
 // ajax route 
 app.put('/updatephantram',async (req, res) => {
   var id = req.body.id;
@@ -1416,3 +1653,26 @@ app.put('/regetcoupon',(req, res)=> {
   res.redirect('/checkout');
 })
 
+app.get('/abc',async (req, res) => {
+  let hangton = require('./model/tonkho');
+  let getallhangton =await hangton.find({});
+  console.log(getallhangton.length);
+  let ar = [];
+  getallhangton.forEach(async elem => {
+    let tam = await allsp.findById({ _id: new ObjectId(elem.id) });
+    console.log(tam);
+    ar.push({
+      id: elem.id,
+      tensp: tam.tensp,
+      hsd: tam.hsd,
+      ngaynhap: elem.ngaynhap,
+      ngayhethan:
+        tam.hsd.split(' ')[1] == 'month'
+          ? addDays(elem.ngaynhap,Number(tam.hsd.split(' ')[0]) * 30)
+          : addDays(elem.ngaynhap,Number(tam.hsd.split(' ')[0])),
+    });
+    console.log(ar);
+  })
+  console.log(ar);
+  res.send('ok');
+})
